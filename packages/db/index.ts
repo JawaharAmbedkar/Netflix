@@ -1,4 +1,3 @@
-// packages/db/index.ts
-// packages/db/index.ts
-export * from "./client";
+import prisma from "./client";
 
+export default prisma;   // <- default export
