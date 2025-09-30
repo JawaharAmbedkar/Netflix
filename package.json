@@ -1,5 +1,5 @@
 {
-  "name": "Netflix2.0",
+  "name": "netflix2.0",
   "private": true,
   "scripts": {
     "build": "turbo run build",
