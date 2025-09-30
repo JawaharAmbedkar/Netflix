@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "outDir": "dist",
+    "paths": {
+      "@repo/db": ["packages/db/index.ts"]
+    }
+  },
+  "include": ["**/*.ts"]
+}
