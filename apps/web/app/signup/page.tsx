@@ -8,9 +8,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { UserSchema, UserType } from 'apps/web/types/user';
 
-
-
-
 export default function Signup() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);

@@ -20,7 +20,7 @@ export const Navbar = () => {
   }, []);
 
   return (
-    <div className="flex justify-between items-center py-5 px-8 pb-2 w-full">
+    <div className="flex justify-between items-center py-5 px-8 pb-2 w-full ">
       
       {/* -------- Mobile Navbar (<sm) -------- */}
       <div className="flex justify-between items-center w-full sm:hidden">

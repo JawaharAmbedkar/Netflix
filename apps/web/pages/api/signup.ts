@@ -1,39 +1,22 @@
-import prisma from '@repo/db/client';
-import bcrypt from 'bcrypt';
-import type { NextApiRequest, NextApiResponse } from 'next';
-
-function validateEmail(email: string) {
-  return /^\S+@\S+\.\S+$/.test(email);
-}
+import { NextApiRequest, NextApiResponse } from "next";
+import prisma from "@repo/db/client";
+import { hash } from "bcrypt";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
-  }
+  if (req.method !== "POST") return res.status(405).json({ message: "Method not allowed" });
+
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ message: "Missing required fields" });
 
   try {
-    const { email, password, name } = req.body;
+    const hashedPassword = await hash(password, 10);
 
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
-    }
-
-    if (!validateEmail(email)) {
-      return res.status(400).json({ message: 'Invalid email format' });
-    }
-
-    const existingUser = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
-    if (existingUser) {
-      return res.status(409).json({ message: 'User already exists' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await prisma.user.create({
+    const createdUser = await prisma.user.create({
       data: {
-        email: email.toLowerCase(),
+        email,
         password: hashedPassword,
-        name: name?.trim() || null,
+        membership: false,
+        amount: 1000,
         membershipRecord: {
           create: {
             amount: 1000,
@@ -41,13 +24,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           },
         },
       },
+      include: { membershipRecord: true },
     });
 
-    console.log('User created:', user);
-
-    return res.status(201).json({ message: 'User created', userId: user.id });
-  } catch (error: any) {
-    console.error('Signup error:', error.message || error);
-    return res.status(500).json({ message: 'Internal server error' });
+    return res.status(201).json({ message: "User created successfully", user: createdUser });
+  } catch (error) {
+    console.error("Signup error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 }

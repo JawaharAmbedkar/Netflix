@@ -1,4 +1,4 @@
-import prisma from "packages/db/client"
+import prisma from "@repo/db/client"
 
 async function testCreateUser() {
   try {

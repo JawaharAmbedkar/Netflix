@@ -1,12 +1,12 @@
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
-    "email" TEXT NOT NULL,
     "name" TEXT,
-    "image" TEXT,
-    "password" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "email" TEXT,
+    "password" TEXT,
+    "phone" TEXT,
+    "membership" BOOLEAN NOT NULL DEFAULT false,
+    "amount" INTEGER NOT NULL DEFAULT 1000,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -27,6 +27,9 @@ CREATE TABLE "Membership" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Membership_userId_key" ON "Membership"("userId");

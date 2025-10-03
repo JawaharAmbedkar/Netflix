@@ -1,36 +1,35 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 const PAYMENT_AMOUNT = 149;
 
 export default function MembershipPayment() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
+  // Redirect if already has membership
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user?.membership) {
+      router.replace('/');
+    }
+  }, [status, session, router]);
+
   if (status === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        Loading...
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center text-white">Loading...</div>;
   }
 
   if (!session) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        Please sign in to make a payment.
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center text-white">Please sign in to make a payment.</div>;
   }
 
-  function loadRazorpayScript() {
-    return new Promise<boolean>((resolve) => {
-      if (document.getElementById('razorpay-script')) {
-        resolve(true);
-        return;
-      }
+  const loadRazorpayScript = () =>
+    new Promise<boolean>((resolve) => {
+      if (document.getElementById('razorpay-script')) return resolve(true);
+
       const script = document.createElement('script');
       script.id = 'razorpay-script';
       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
@@ -38,9 +37,8 @@ export default function MembershipPayment() {
       script.onerror = () => resolve(false);
       document.body.appendChild(script);
     });
-  }
 
-  async function handlePayment() {
+  const handlePayment = async () => {
     setLoading(true);
 
     const loaded = await loadRazorpayScript();
@@ -51,20 +49,18 @@ export default function MembershipPayment() {
     }
 
     try {
+      // Create order
       const orderRes = await fetch('/api/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: PAYMENT_AMOUNT }),
       });
 
+      if (!orderRes.ok) throw new Error('Order creation failed');
       const orderData = await orderRes.json();
-      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY;
 
-      if (!razorpayKey) {
-        alert('Razorpay key missing.');
-        setLoading(false);
-        return;
-      }
+      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      if (!razorpayKey) throw new Error('Razorpay key missing');
 
       const options = {
         key: razorpayKey,
@@ -73,11 +69,11 @@ export default function MembershipPayment() {
         name: 'Netflix 2.0',
         description: 'Membership Payment',
         order_id: orderData.id,
-        handler: async function (response: {
+        handler: async (response: {
           razorpay_order_id: string;
           razorpay_payment_id: string;
           razorpay_signature: string;
-        }) {
+        }) => {
           try {
             const verifyRes = await fetch('/api/verify-payment', {
               method: 'POST',
@@ -88,49 +84,43 @@ export default function MembershipPayment() {
             const verifyData = await verifyRes.json();
 
             if (verifyRes.ok && verifyData.success) {
-              await fetch('/api/auth/session?update=true'); // force refresh
-              window.location.href = '/'; // redirect to homepage
+              await update?.(); // refresh session
+              router.push('/');
             } else {
               alert('Payment verification failed. Please contact support.');
-              setLoading(false);
             }
-          } catch (error) {
-            console.error('Verification error:', error);
+          } catch (err) {
+            console.error('Error during payment verification:', err);
             alert('An error occurred during payment verification.');
+          } finally {
             setLoading(false);
           }
         },
-        prefill: {
-          email: session?.user?.email ?? '',
-        },
-        theme: {
-          color: '#e50914',
-        },
+        prefill: { email: session.user.email ?? '' },
+        theme: { color: '#e50914' },
       };
 
       const rzp = new (window as any).Razorpay(options);
-
-      rzp.on('payment.failed', () => {
-        alert('Payment failed.');
+      rzp.on('payment.failed', (err: any) => {
+        console.error('Payment failed:', err);
+        alert('Payment failed. Please try again.');
         setLoading(false);
       });
-
-      rzp.on('modal.dismiss', () => {
-        setLoading(false);
-      });
-
+      rzp.on('modal.dismiss', () => setLoading(false));
       rzp.open();
     } catch (err) {
-      console.error(err);
-      alert('An error occurred while processing payment.');
+      console.error('Error while processing payment:', err);
+      alert('Error while processing payment.');
       setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white p-6">
-      <img className="w-35 sm:w-50 sm:m-3" src="/png/series/netflix.png" alt="netflix" />
-      <h1 className="flex text-center text-2xl sm:text-3xl my-6 font-semibold">Complete your Netflix membership payment</h1>
+      <img className="w-36 sm:w-48 sm:m-3" src="/png/series/netflix.png" alt="Netflix" />
+      <h1 className="text-2xl sm:text-3xl font-semibold my-6 text-center">
+        Complete your Netflix membership payment
+      </h1>
       <button
         disabled={loading}
         onClick={handlePayment}

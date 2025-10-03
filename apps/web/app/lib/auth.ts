@@ -1,10 +1,9 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import prisma from "@repo/db";
+import prisma from "@repo/db/client";
 import { compare } from "bcrypt";
 import { UserSchema } from "apps/web/types/user";
-
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -15,41 +14,29 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        
         const parsed = UserSchema.safeParse(credentials);
-        if (!parsed.success) {
-          throw new Error("Invalid credentials format");
-        }
+        if (!parsed.success) throw new Error("Invalid credentials format");
 
         const { email, password } = parsed.data;
         const emailOrPhone = email.toLowerCase();
 
-       
         const user = await prisma.user.findFirst({
-          where: {
-            OR: [{ email: emailOrPhone }, { phone: emailOrPhone }],
-          },
+          where: { OR: [{ email: emailOrPhone }, { phone: emailOrPhone }] },
           include: { membershipRecord: true },
         });
 
-        if (!user || !user.password) {
-          throw new Error("User does not exist");
-        }
+        if (!user || !user.password) throw new Error("User does not exist");
 
-        
         const isValid = await compare(password, user.password);
-        if (!isValid) {
-          throw new Error("Invalid password");
-        }
+        if (!isValid) throw new Error("Invalid password");
 
-        
         return {
-          id: user.id.toString(),
+          id: String(user.id), 
           email: user.email,
-          name: user.name ?? null,
-          membership: user.membershipRecord?.status ?? false,
-          amount: user.membershipRecord?.amount ?? 0,
-        } as any;
+          name: user.name,
+          membership: user.membership,
+          amount: user.amount,
+        };
       },
     }),
 
@@ -71,9 +58,8 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google" && user?.email) {
-        const existingUser = await prisma.user.findUnique({
+        let existingUser = await prisma.user.findUnique({
           where: { email: user.email },
-          include: { membershipRecord: true },
         });
 
         if (!existingUser) {
@@ -83,22 +69,13 @@ export const authOptions: NextAuthOptions = {
               name: user.name ?? null,
               membership: false,
               amount: 1000,
-              membershipRecord: {
-                create: {
-                  amount: 1000,
-                  status: false,
-                },
-              },
+              membershipRecord: { create: { amount: 1000, status: false } },
             },
           });
 
-          user.id = createdUser.id.toString();
-          user.membership = false;
-          user.amount = 1000;
+          user.id = String(createdUser.id); 
         } else {
-          user.id = existingUser.id.toString();
-          user.membership = existingUser.membershipRecord?.status ?? false;
-          user.amount = existingUser.membershipRecord?.amount ?? 0;
+          user.id = String(existingUser.id); 
         }
       }
 
@@ -107,20 +84,20 @@ export const authOptions: NextAuthOptions = {
 
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.membership = user.membership;
-        token.amount = user.amount;
+        token.id = user.id; 
+        token.email = user.email;
+        token.name = user.name;
       }
 
       if (token.id) {
-        const userInDb = await prisma.user.findUnique({
-          where: { id: Number(token.id) },
-          include: { membershipRecord: true },
+        const dbUser = await prisma.user.findUnique({
+          where: { id: Number(token.id) }, 
+          select: { membership: true, amount: true },
         });
 
-        if (userInDb) {
-          token.membership = userInDb.membershipRecord?.status ?? false;
-          token.amount = userInDb.membershipRecord?.amount ?? 0;
+        if (dbUser) {
+          token.membership = dbUser.membership;
+          token.amount = dbUser.amount;
         }
       }
 
@@ -128,15 +105,18 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }) {
-      if (session.user && token) {
-        session.user.id = token.id as string;
+      if (session.user) {
+        session.user.id = String(token.id); 
+        session.user.email = token.email as string;
+        session.user.name = token.name as string | null;
         session.user.membership = token.membership as boolean;
         session.user.amount = token.amount as number;
       }
-
       return session;
     },
   },
+
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 export default NextAuth(authOptions);
