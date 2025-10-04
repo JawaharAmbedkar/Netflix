@@ -1,7 +1,6 @@
 // components/TopSearches.tsx
 'use client';
 
-import Link from "next/link";
 import { Video } from "../videos/TopSearches/video"
 
 interface TopSearchesProps {
