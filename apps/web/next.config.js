@@ -1,4 +1,7 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {};
+// apps/web/next.config.js
+const withTM = require('next-transpile-modules')(['@repo/db']);
 
-export default nextConfig;
+module.exports = withTM({
+  reactStrictMode: true,
+  experimental: { optimizeCss: false }, // optional
+});
