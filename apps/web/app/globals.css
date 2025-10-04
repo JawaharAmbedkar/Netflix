@@ -1,4 +1,3 @@
-/* Use this in Tailwind 4.1+ */
-
-@import "tailwindcss/preflight";  /* replaces @tailwind base */
+/* Tailwind 4.1+ syntax */
+@import "tailwindcss/preflight";   /* replaces @tailwind base */
 @import "tailwindcss/utilities";  /* replaces @tailwind components & utilities */
