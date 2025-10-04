@@ -1,0 +1,120 @@
+[33mcommit dca8904ce4d462afdff904582c3f46a60b4e4148[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Fri Oct 3 22:44:52 2025 +0530
+
+    Update Tailwind and PostCSS config to .cjs and adjust globals.css
+
+[33mcommit bfcd4df3b915ed83eaf42b3274fab93217fbe0a0[m
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Fri Oct 3 22:25:49 2025 +0530
+
+    Update next.config.js
+
+[33mcommit 2e6d8641cc9e97d68d6259c8230aeb3e2dacdfe6[m
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Fri Oct 3 22:01:13 2025 +0530
+
+    Update next.config.js, package.json, package-lock.json, turbo.json for Vercel build fix
+
+[33mcommit 220f6f21fc49a37acb4a16c94cbfa6508ba7f9a7[m
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Fri Oct 3 21:33:04 2025 +0530
+
+    changed turbo.json added NEXT_PUBLIC_RAZORPAY_KEY_ID
+
+[33mcommit 71ec717b8693dffd8d494e950010c072d1ee24b5[m
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Fri Oct 3 21:22:13 2025 +0530
+
+    Refactor profile sidebar, update name flow, rename files, update APIs and Prisma schema
+
+[33mcommit 93317ecc9b3e40c22738081ccaa0a5ef10de81d7[m
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Tue Sep 30 20:27:47 2025 +0530
+
+    Updated how i imported prisma from index.ts and tsconfig.json file
+
+[33mcommit 27bdd06df8e05b9c1987ed546a90fb405d8107cf[m
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Tue Sep 30 20:17:18 2025 +0530
+
+    Update db package.json for Vercel build
+
+[33mcommit 2a69103bdc6dc5864d10aef87fab75c6f1ade89f[m
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Tue Sep 30 20:16:21 2025 +0530
+
+    Fix Prisma client index.ts and package.json turbo repo for Vercel-safe build
+
+[33mcommit c35200e1f0e7ac0b1f244087d050003c3401e61c[m
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Tue Sep 30 19:59:19 2025 +0530
+
+    Fix Prisma client for Vercel-safe build
+
+[33mcommit ef2d48327a1ddeab51dc7acebd906df98671fc94[m
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Tue Sep 30 19:56:20 2025 +0530
+
+    Fix Prisma client for development and production
+
+[33mcommit 868ff6ce600e559cdb71e4ecc00669db4a33f6a6[m
+Merge: b28d713 4512950
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Tue Sep 30 19:47:46 2025 +0530
+
+    Merge branch 'main' of https://github.com/JawaharAmbedkar/Netflix
+
+[33mcommit b28d713575047364d956730a8ce0ad9ac6a09d63[m
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Tue Sep 30 19:47:07 2025 +0530
+
+    Fix turbo.json schema for Vercel build
+
+[33mcommit 451295087e1ed93b4dfc615aae118b16d271f01f[m
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Tue Sep 30 19:41:03 2025 +0530
+
+    Delete apps/web/app/test directory
+
+[33mcommit 597bd2192195676f1c093464721e43f933f4e95b[m
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Tue Sep 30 19:12:23 2025 +0530
+
+    Fix Prisma generation and env vars for Vercel build
+
+[33mcommit bad4041d973a6aaa1bee7f7cecfd9b4cd6362e97[m
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Tue Sep 30 17:54:23 2025 +0530
+
+    Update db package.json and turbo.json for deployment
+
+[33mcommit df5283033a6a16e8863c6d025364d879653b3bce[m
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Tue Sep 30 17:28:02 2025 +0530
+
+    Update package files
+
+[33mcommit ce804d90c003171ef3266ec629ef820e99e4e56d[m
+Author: JawaharAmbedkar <jawahar7988@gmail.com>
+Date:   Tue Sep 30 16:27:32 2025 +0530
+
+    Save all local project files
+
+[33mcommit 0376bd231d3150a44898b6338f5b528ca2a64e70[m
+Author: Turbobot <turbobot@vercel.com>
+Date:   Tue Jun 3 09:47:46 2025 +0530
+
+    feat(create-turbo): apply package-manager transform
+
+[33mcommit cdf110824683851cf14c1cd59a009b00ce3dc140[m
+Author: Turbobot <turbobot@vercel.com>
+Date:   Tue Jun 3 09:47:45 2025 +0530
+
+    feat(create-turbo): apply official-starter transform
+
+[33mcommit d508e4f3b3164e17e0dbda40082503586ce73307[m
+Author: Turbobot <turbobot@vercel.com>
+Date:   Tue Jun 3 09:47:44 2025 +0530
+
+    feat(create-turbo): create basic

@@ -1,7 +1,4 @@
-import withTM from 'next-transpile-modules';
+/** @type {import('next').NextConfig} */
+const nextConfig = {};
 
-const nextConfig = {
-  reactStrictMode: true,
-};
-
-export default withTM(['@repo/db'])(nextConfig);
+export default nextConfig;
