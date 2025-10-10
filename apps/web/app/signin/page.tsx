@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { UserSchema, UserType } from '../../types/user';
-
+import Image from 'next/image';
 
 export default function SignIn() {
   const router = useRouter();
@@ -69,13 +69,13 @@ export default function SignIn() {
   return (
     <div className="w-screen h-screen relative overflow-hidden">
       {/* Background */}
-      <img
+      <Image
         src="/background/backgroundImage2.jpg"
         alt="Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
       <div className="absolute inset-0 bg-black opacity-60 z-10" />
-      <img
+      <Image
         className="absolute top-6 left-10 z-20"
         src="/png/series/netflix.png"
         alt="Netflix"

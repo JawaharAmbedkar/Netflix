@@ -6,7 +6,8 @@
     "RAZORPAY_KEY_SECRET",
     "DATABASE_URL",
     "NEXTAUTH_SECRET",
-    "NEXTAUTH_URL"
+    "NEXTAUTH_URL",
+    "GOOGLE_CLIENT_ID"
   ],
   "tasks": {
     "build": {

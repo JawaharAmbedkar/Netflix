@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import ProfileSidebar from "./profileSideBar";
 import SearchBar from "./search";
 import Link from 'next/link';
+import Image from 'next/image';
 
 export const Navbar = () => {
   const [notifOpen, setNotifOpen] = useState(false);
@@ -25,7 +26,7 @@ export const Navbar = () => {
       {/* -------- Mobile Navbar (<sm) -------- */}
       <div className="flex justify-between items-center w-full sm:hidden">
         <Link href={"/"}>
-          <img
+          <Image
             src="/png/series/netflix.png"
             alt="netflix"
             className="w-[70px] mr-8 sm:w-[90px] sm:mr-5"
@@ -72,7 +73,7 @@ export const Navbar = () => {
         {/* Left: Logo + Nav Links */}
         <div className="flex items-center">
           <Link href={"/"}>
-            <img
+            <Image
               src="/png/series/netflix.png"
               alt="netflix"
               className="w-[100px] mr-5 lg:w-[120px] lg:mr-8"

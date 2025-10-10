@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const PAYMENT_AMOUNT = 149;
 
@@ -117,7 +118,7 @@ export default function MembershipPayment() {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white p-6">
-      <img className="w-36 sm:w-48 sm:m-3" src="/png/series/netflix.png" alt="Netflix" />
+      <Image className="w-36 sm:w-48 sm:m-3" src="/png/series/netflix.png" alt="Netflix" />
       <h1 className="text-2xl sm:text-3xl font-semibold my-6 text-center">
         Complete your Netflix membership payment
       </h1>

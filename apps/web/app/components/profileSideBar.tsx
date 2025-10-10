@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
+import Image from 'next/image';
 
 export default function ProfileSidebar() {
   const { data: session, update: refreshSession } = useSession();
@@ -81,10 +82,10 @@ export default function ProfileSidebar() {
     <div className="relative z-50" ref={menuRef}>
       {/* Profile Image */}
       <div className="ml-2 cursor-pointer" onClick={() => setOpen(!open)}>
-        <img
+        <Image
           className="rounded-lg"
           src="/profile/profilePic.jpg"
-          width="50px"
+          width={parseInt("50px")}
           alt="profile"
         />
       </div>
