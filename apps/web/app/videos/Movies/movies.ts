@@ -11,7 +11,7 @@ export const movies: Movies[] = [
         id: 1,
         title: "Interstellar",
         url: "https://www.youtube.com/watch?v=zSWdZVtXT7E&ab_channel=WarnerBros.UK%26Ireland",
-        thumbnail: "/thumbnails/Interstellar"
+        thumbnail: "/thumbnails/interstellar.jpg"
 
     },
     {

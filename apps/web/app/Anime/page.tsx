@@ -6,13 +6,12 @@ import { videos } from "../videos/TopSearches/video";
 import { tvshows } from "../videos/Tv Shows/tvshow";
 import Footer from "../components/footer";
 import TopSearches from "../components/TopSearches";
-import Image from "next/image";
 
 export default function Anime() {
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
-      {/* Background image with blur */}
-      <Image
+      {/* Background img with blur */}
+      <img
         src="/background/backgroundImage.jpg"
         alt="Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
@@ -30,9 +29,9 @@ export default function Anime() {
             <div className="col-span-5 lg:col-span-4">
               {/* Hero Banner */}
               <div className="relative h-[62vh] rounded-lg overflow-hidden mb-6">
-                {/* Image / Link */}
+                {/* img / Link */}
                 <Link href="https://www.youtube.com/watch?v=1KMcoJBMWE4&ab_channel=Crunchyroll">
-                  <Image
+                  <img
                     src="/thumbnails/One-piece-main.jpg"
                     alt="One Piece"
                     className="w-full h-full object-cover"
@@ -41,7 +40,7 @@ export default function Anime() {
 
                 {/* First PNG Logo Overlay */}
                 <div className="absolute bottom-31 right-12 sm:bottom-67 sm:right-26 md:bottom-92 md:right-20 z-20 p-2 w-[200px] sm:w-[250px] md:w-[300px]">
-                  <Image
+                  <img
                     src="/png/series/N-series.png"
                     alt="Series Logo"
                     className="w-full filter brightness-150"
@@ -50,7 +49,7 @@ export default function Anime() {
 
                 {/* Second PNG Logo Overlay */}
                 <div className="absolute bottom-10 right-5 sm:bottom-43 sm:right-20 md:bottom-63 md:right-13 z-20 p-2 w-[250px] sm:w-[300px] md:w-[350px]">
-                  <Image
+                  <img
                     src="/png/series/One-piece.png"
                     alt="One Piece Logo"
                     className="w-full filter brightness-150"
@@ -80,7 +79,7 @@ export default function Anime() {
                       className="hover:scale-105 transition-transform"
                     >
                       <div className="w-full aspect-video rounded-lg overflow-hidden shadow">
-                        <Image
+                        <img
                           src={animeItem.thumbnail}
                           alt={animeItem.title}
                           className="w-full h-full object-cover"
@@ -106,7 +105,7 @@ export default function Anime() {
                       className="hover:scale-105 transition-transform"
                     >
                       <div className="w-full aspect-video rounded-lg overflow-hidden shadow">
-                        <Image
+                        <img
                           src={tvshow.thumbnail}
                           alt={tvshow.title}
                           className="w-full h-full object-cover"
@@ -132,7 +131,7 @@ export default function Anime() {
                       className="hover:scale-105 transition-transform"
                     >
                       <div className="w-full aspect-video rounded-lg overflow-hidden shadow">
-                        <Image
+                        <img
                           src={movie.thumbnail}
                           alt={movie.title}
                           className="w-full h-full object-cover"

@@ -6,13 +6,13 @@ import { videos } from "../videos/TopSearches/video";
 import { tvshows } from "../videos/Tv Shows/tvshow";
 import Footer from "../components/footer";
 import TopSearches from "../components/TopSearches";
-import Image from 'next/image';
+
 
 export default function Movies() {
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
-      {/* Background image with blur */}
-      <Image
+      {/* Background img with blur */}
+      <img
         src="/background/backgroundImage.jpg"
         alt="Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
@@ -30,9 +30,9 @@ export default function Movies() {
             <div className="col-span-5 lg:col-span-4">
               {/* Hero Banner */}
               <div className="relative h-[62vh] rounded-lg overflow-hidden mb-6">
-                {/* Background Image / Link */}
+                {/* Background img / Link */}
                 <Link href="https://www.youtube.com/watch?v=uYPbbksJxIg&t=1s&ab_channel=UniversalPictures">
-                  <Image
+                  <img
                     src="/thumbnails/Oppenheimer.jpg"
                     alt="Oppenheimer"
                     className="w-full h-full object-cover"
@@ -41,7 +41,7 @@ export default function Movies() {
 
                 {/* First PNG Logo Overlay */}
                 <div className="absolute bottom-31 right-12 sm:bottom-54 sm:right-32 md:bottom-73 md:right-30 z-20 p-2 w-[200px] sm:w-[200px]">
-                  <Image
+                  <img
                     src="/png/series/N-series.png"
                     alt="Series Logo"
                     className="w-full filter brightness-150"
@@ -50,7 +50,7 @@ export default function Movies() {
 
                 {/* Second PNG Logo Overlay */}
                 <div className="absolute bottom-10 right-5 sm:bottom-34 sm:right-20 md:bottom-52 md:right-13 z-20 p-2 w-[250px] sm:w-[300px] md:w-[350px]">
-                  <Image
+                  <img
                     src="/png/series/Oppenheimer-Movie-Logo.png"
                     alt="Oppenheimer Logo"
                     className="w-full filter brightness-150"
@@ -83,7 +83,7 @@ export default function Movies() {
                       className="hover:scale-105 transition-transform"
                     >
                       <div className="w-full aspect-video rounded-lg overflow-hidden shadow">
-                        <Image
+                        <img
                           src={movie.thumbnail}
                           alt={movie.title}
                           className="w-full h-full object-cover"
@@ -109,7 +109,7 @@ export default function Movies() {
                       className="hover:scale-105 transition-transform"
                     >
                       <div className="w-full aspect-video rounded-lg overflow-hidden shadow">
-                        <Image
+                        <img
                           src={tvshow.thumbnail}
                           alt={tvshow.title}
                           className="w-full h-full object-cover"
@@ -135,7 +135,7 @@ export default function Movies() {
                       className="hover:scale-105 transition-transform"
                     >
                       <div className="w-full aspect-video rounded-lg overflow-hidden shadow">
-                        <Image
+                        <img
                           src={animeItem.thumbnail}
                           alt={animeItem.title}
                           className="w-full h-full object-cover"

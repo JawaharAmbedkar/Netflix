@@ -30,9 +30,9 @@ export const anime: Anime[] = [
     },
     {
         id:4,
-        title: "Dragon-ball-z",
+        title: "DragonBallZ",
         url: "https://www.youtube.com/watch?v=sxufB6DxXk0&ab_channel=RottenTomatoesTrailers",
-        thumbnail: "/thumbnails/Dragon-Ball-z.jpg"
+        thumbnail: "/thumbnails/DragonBallZ.jpg"
 
     },
 

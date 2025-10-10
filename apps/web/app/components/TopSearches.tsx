@@ -2,7 +2,7 @@
 'use client';
 
 import { Video } from "../videos/TopSearches/video"
-import Image from 'next/image';
+
 
 interface TopSearchesProps {
   videos: Video[];
@@ -22,7 +22,7 @@ export default function TopSearches({ videos }: TopSearchesProps) {
             className="hover:scale-105 transition-transform"
           >
             <div className="w-full aspect-video rounded-lg overflow-hidden shadow">
-              <Image
+              <img
                 src={video.thumbnail}
                 alt={video.title}
                 className="w-full h-full object-cover"

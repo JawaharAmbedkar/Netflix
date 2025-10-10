@@ -118,7 +118,7 @@ export default function MembershipPayment() {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white p-6">
-      <Image className="w-36 sm:w-48 sm:m-3" src="/png/series/netflix.png" alt="Netflix" />
+      <img className="sm:w-48 sm:m-3" src="/png/series/netflix.png" alt="Netflix" />
       <h1 className="text-2xl sm:text-3xl font-semibold my-6 text-center">
         Complete your Netflix membership payment
       </h1>

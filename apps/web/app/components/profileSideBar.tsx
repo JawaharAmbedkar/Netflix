@@ -2,71 +2,24 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signOut, useSession } from 'next-auth/react';
-import Image from 'next/image';
+import { signOut } from 'next-auth/react';
+import { useUser } from '../context/UserContext'; // adjust path if needed
 
 export default function ProfileSidebar() {
-  const { data: session, update: refreshSession } = useSession();
+  const { name, setName } = useUser(); // use context instead of local session
   const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState('New User');
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState(name);
+  const [showSavedMsg, setShowSavedMsg] = useState(false);
 
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Sync name with session
   useEffect(() => {
-    if (session?.user?.name) {
-      setName(session.user.name);
-      setInputValue(session.user.name);
-    }
-  }, [session?.user?.name]);
+    setInputValue(name); // sync input with current name
+  }, [name]);
 
-  const handleLogout = async () => {
-    await signOut({ redirect: false });
-    router.push('/signin');
-  };
-
-  const handleEditClick = () => {
-    setIsEditing(true);
-    setInputValue(name);
-  };
-
-  const handleSaveClick = async () => {
-    const trimmedName = inputValue.trim() || "New User";
-
-    // Optimistic update for instant UI feedback
-    setName(trimmedName);
-    setIsEditing(false);
-
-    try {
-      const res = await fetch("/api/update-name", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: trimmedName }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to update name");
-
-      // Refresh session to update JWT with new name
-      await refreshSession();
-    } catch (err) {
-      console.error(err);
-      alert("Failed to update name in database");
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleSaveClick();
-  };
-
-  // Close dropdown when clicking outside
+  // Close dropdown if clicking outside
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -78,19 +31,63 @@ export default function ProfileSidebar() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
+    router.push('/signin');
+  };
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+    setInputValue(name);
+    setShowSavedMsg(false);
+  };
+
+  const handleSaveClick = async () => {
+    const trimmedName = inputValue.trim() || 'New User';
+
+    try {
+      const res = await fetch('/api/update-name', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: trimmedName }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update name');
+
+      // ✅ Update context instantly
+      setName(trimmedName);
+      setInputValue(trimmedName);
+      setIsEditing(false);
+      setShowSavedMsg(true);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update name in database');
+      setInputValue(name); // revert input to current context name
+      setShowSavedMsg(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') handleSaveClick();
+  };
+
   return (
     <div className="relative z-50" ref={menuRef}>
-      {/* Profile Image */}
       <div className="ml-2 cursor-pointer" onClick={() => setOpen(!open)}>
-        <Image
+        <img
           className="rounded-lg"
           src="/profile/profilePic.jpg"
-          width={parseInt("50px")}
+          width={50}
+          height={50}
           alt="profile"
         />
       </div>
 
-      {/* Sidebar Dropdown */}
       <div
         className={`
           absolute right-0 mt-2 w-60 bg-black text-white rounded-lg shadow-lg transition-all duration-300 ease-out
@@ -117,6 +114,7 @@ export default function ProfileSidebar() {
           <div className="mt-1">
             {isEditing ? (
               <button
+                type="button"
                 className="text-sm text-green-400 mt-1"
                 onClick={handleSaveClick}
               >
@@ -124,6 +122,7 @@ export default function ProfileSidebar() {
               </button>
             ) : (
               <button
+                type="button"
                 className="text-sm text-gray-400"
                 onClick={handleEditClick}
               >
@@ -132,11 +131,18 @@ export default function ProfileSidebar() {
             )}
           </div>
 
+          {showSavedMsg && (
+            <div className="text-xs text-yellow-400 mt-1">
+              Name updated! Log out and sign in again to see the permanent change.
+            </div>
+          )}
+
           <div className="text-m text-gray-400 mt-2">Netflix+ Member</div>
         </div>
 
         <div className="p-2 space-y-2">
           <button
+            type="button"
             className="w-full text-left px-4 py-2 hover:bg-gray-800 rounded-md text-red-400"
             onClick={handleLogout}
           >

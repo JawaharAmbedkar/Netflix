@@ -11,7 +11,6 @@ import { useRouter } from "next/navigation";
 import Footer from "../components/footer";
 import TopSearches from "../components/TopSearches";
 import { videos } from "../videos/TopSearches/video";
-import Image from 'next/image';
 
 export default function Homepage() {
   const { data: session, status } = useSession();
@@ -41,7 +40,7 @@ export default function Homepage() {
 
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
-      <Image
+      <img
         src="/background/backgroundImage.jpg"
         alt="Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
@@ -66,8 +65,8 @@ export default function Homepage() {
                     playsInline
                   />
                   {showPoster && (
-                    <Image
-                      src="/Main-video/Money-Heist.jpg"
+                    <img
+                      src="/main-video/Money-Heist.jpg"
                       alt="Series Poster"
                       className="absolute top-0 left-0 w-full h-full object-cover z-10 transition-opacity duration-1000"
                     />
@@ -76,7 +75,7 @@ export default function Homepage() {
 
                 {/* Series Logo Overlay */}
                 <div className="absolute bottom-4 right-0.2 sm:right-1 z-20 p-2 w-[300px] sm:bottom-43 sm:w-[350] md:w-[400px] md:bottom-62">
-                  <Image
+                  <img
                     src="/png/series/series.png"
                     alt="Money Heist Logo"
                     className="w-full filter brightness-150"
@@ -99,7 +98,7 @@ export default function Homepage() {
                   {tvshows.map(tv => (
                     <a key={tv.id} href={tv.url} target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-transform">
                       <div className="w-full aspect-video rounded-lg overflow-hidden shadow">
-                        <Image src={tv.thumbnail} alt={tv.title} className="w-full h-full object-cover" />
+                        <img src={tv.thumbnail} alt={tv.title} className="w-full h-full object-cover" />
                       </div>
                     </a>
                   ))}
@@ -115,7 +114,7 @@ export default function Homepage() {
                   {movies.map(movie => (
                     <a key={movie.id} href={movie.url} target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-transform">
                       <div className="w-full aspect-video rounded-lg overflow-hidden shadow">
-                        <Image src={movie.thumbnail} alt={movie.title} className="w-full h-full object-cover" />
+                        <img src={movie.thumbnail} alt={movie.title} className="w-full h-full object-cover" />
                       </div>
                     </a>
                   ))}
@@ -131,7 +130,7 @@ export default function Homepage() {
                   {anime.map(animeItem => (
                     <a key={animeItem.id} href={animeItem.url} target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-transform">
                       <div className="w-full aspect-video rounded-lg overflow-hidden shadow">
-                        <Image src={animeItem.thumbnail} alt={animeItem.title} className="w-full h-full object-cover" />
+                        <img src={animeItem.thumbnail} alt={animeItem.title} className="w-full h-full object-cover" />
                       </div>
                     </a>
                   ))}
