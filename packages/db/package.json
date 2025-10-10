@@ -9,5 +9,8 @@
   "dependencies": {
     "@prisma/client": "^6.17.0",
     "prisma": "latest"
+  },
+  "prisma": {
+    "binaryTargets": ["native", "debian-openssl-3.0.x"]
   }
 }
