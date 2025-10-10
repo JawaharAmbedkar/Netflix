@@ -1,12 +1,11 @@
-const path = require("path");
+import path from "path";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config) => {
-    // Resolve '@repo' to the packages folder in your monorepo
-    config.resolve.alias["@repo"] = path.resolve(__dirname, "../../packages");
+    config.resolve.alias["@repo"] = path.resolve("./../../packages");
     return config;
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
