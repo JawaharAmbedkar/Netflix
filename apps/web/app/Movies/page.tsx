@@ -29,7 +29,7 @@ export default function Movies() {
             {/* Left side: Main Video & Sliders */}
             <div className="col-span-5 lg:col-span-4">
               {/* Hero Banner */}
-              <div className="relative h-[62vh] rounded-lg overflow-hidden mb-6">
+              <div className="relative min-h-[620px] h-[62vh] rounded-lg overflow-hidden mb-6">
                 {/* Background img / Link */}
                 <Link href="https://www.youtube.com/watch?v=uYPbbksJxIg&t=1s&ab_channel=UniversalPictures">
                   <img
@@ -40,7 +40,7 @@ export default function Movies() {
                 </Link>
 
                 {/* First PNG Logo Overlay */}
-                <div className="absolute bottom-31 right-12 sm:bottom-54 sm:right-32 md:bottom-73 md:right-30 z-20 p-2 w-[200px] sm:w-[200px]">
+                <div className="absolute bottom-[90px] right-[90px] sm:bottom-[225px] sm:right-[150px] md:top-[265px] md:right-[130px] z-20 p-2 w-[160px] md:w-[170px]">
                   <img
                     src="/png/series/N-series.png"
                     alt="Series Logo"
@@ -49,7 +49,7 @@ export default function Movies() {
                 </div>
 
                 {/* Second PNG Logo Overlay */}
-                <div className="absolute bottom-10 right-5 sm:bottom-34 sm:right-20 md:bottom-52 md:right-13 z-20 p-2 w-[250px] sm:w-[300px] md:w-[350px]">
+                <div className="absolute w-[300px]  bottom-[8px] right-5 sm:bottom-[140px] sm:right-20 md:bottom-52 md:right-11 z-20 p-2 sm:w-[300px] md:w-[350px]">
                   <img
                     src="/png/series/Oppenheimer-Movie-Logo.png"
                     alt="Oppenheimer Logo"

@@ -53,7 +53,7 @@ export default function Homepage() {
         <div id="mainVideo" className="min-h-screen p-4">
           <div className="grid grid-cols-5 gap-4">
             <div className="col-span-5 lg:col-span-4">
-              <div className="relative h-[62vh] rounded-lg overflow-hidden mb-6">
+              <div className="relative min-h-[620px] h-[62vh] rounded-lg overflow-hidden mb-6">
                 {/* Video / Poster */}
                 <Link href="https://www.youtube.com/watch?v=_InqQJRqGW4&ab_channel=Netflix">
                   <video
@@ -74,7 +74,7 @@ export default function Homepage() {
                 </Link>
 
                 {/* Series Logo Overlay */}
-                <div className="absolute bottom-4 right-0.2 sm:right-1 z-20 p-2 w-[300px] sm:bottom-43 sm:w-[350] md:w-[400px] md:bottom-62">
+                <div className="absolute bottom-[10px] right-[0.1px] sm:right-1 z-20 p-2 w-[300px] sm:bottom-40 sm:w-[350] md:w-[400px] md:top-[50px] md:right-6">
                   <img
                     src="/png/series/series.png"
                     alt="Money Heist Logo"

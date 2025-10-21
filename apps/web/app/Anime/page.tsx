@@ -28,7 +28,7 @@ export default function Anime() {
             {/* Left side: Main Video & Sliders */}
             <div className="col-span-5 lg:col-span-4">
               {/* Hero Banner */}
-              <div className="relative h-[62vh] rounded-lg overflow-hidden mb-6">
+              <div className="relative min-h-[620px] h-[62vh] rounded-lg overflow-hidden mb-6">
                 {/* img / Link */}
                 <Link href="https://www.youtube.com/watch?v=1KMcoJBMWE4&ab_channel=Crunchyroll">
                   <img
@@ -39,7 +39,7 @@ export default function Anime() {
                 </Link>
 
                 {/* First PNG Logo Overlay */}
-                <div className="absolute bottom-31 right-12 sm:bottom-67 sm:right-26 md:bottom-92 md:right-20 z-20 p-2 w-[200px] sm:w-[250px] md:w-[300px]">
+                <div className="absolute bottom-[128px] right-[61px] sm:top-[300px] sm:right-[140px] md:top-[195px] md:right-[140px] z-20 p-2 w-[160px] md:w-[170px]">
                   <img
                     src="/png/series/N-series.png"
                     alt="Series Logo"
@@ -48,7 +48,7 @@ export default function Anime() {
                 </div>
 
                 {/* Second PNG Logo Overlay */}
-                <div className="absolute bottom-10 right-5 sm:bottom-43 sm:right-20 md:bottom-63 md:right-13 z-20 p-2 w-[250px] sm:w-[300px] md:w-[350px]">
+                <div className="absolute bottom-10 right-5 sm:bottom-[160px] sm:right-[80px] md:bottom-[248px] md:right-[60px] z-20 p-2 w-[250px] sm:w-[300px] md:w-[350px]">
                   <img
                     src="/png/series/One-piece.png"
                     alt="One Piece Logo"

@@ -29,7 +29,7 @@ export default function TvShow() {
             {/* Left side: Main Video & Sliders */}
             <div className="col-span-5 lg:col-span-4">
               {/* Hero Banner */}
-              <div className="relative h-[62vh] rounded-lg overflow-hidden mb-6">
+              <div className="relative min-h-[620px] h-[62vh] rounded-lg overflow-hidden mb-6">
                 {/* Background img / Link */}
                 <Link href="https://www.youtube.com/watch?v=YQeUmSD1c3g&ab_channel=DexteronParamount%2BwithShowtime">
                   <img
@@ -40,7 +40,7 @@ export default function TvShow() {
                 </Link>
 
                 {/* First PNG Logo Overlay */}
-                <div className="absolute bottom-34 right-16 sm:bottom-70 sm:right-26 md:bottom-85 md:right-23 z-20 p-2 w-[150px] sm:w-[160px] md:w-[170px]">
+                <div className="absolute bottom-[170px] right-[40px] sm:top-[280px] sm:right-[110px] md:top-[215px] md:right-[130px] z-20 p-2 w-[160px] md:w-[170px]">
                   <img
                     src="/png/series/N-series.png"
                     alt="Series Logo"
@@ -49,13 +49,14 @@ export default function TvShow() {
                 </div>
 
                 {/* Second PNG Logo Overlay */}
-                <div className="absolute bottom-1 right-10 sm:bottom-37 sm:right-22 md:bottom-50 md:right-18 z-20 p-2 w-[200px] sm:w-[200px] md:w-[210px]">
+                <div className="absolute bottom-[30px] right-[30px] sm:bottom-[150px] sm:right-[100px] md:bottom-[200px] md:right-[110px] z-20 p-2 w-[200px] md:w-[210px]">
                   <img
                     src="/png/series/Dexter.png"
                     alt="Dexter Logo"
                     className="w-full filter brightness-150"
                   />
                 </div>
+
 
                 {/* Paragraph Overlay */}
                 <div className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 md:bottom-6 md:right-6 z-20 p-4 rounded-md max-w-[500px] sm:max-w-[450px] md:max-w-[400px] backdrop-blur-md hidden sm:block">
