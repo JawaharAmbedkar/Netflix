@@ -67,7 +67,7 @@ export default function Signup() {
     <div className="w-screen h-screen relative overflow-hidden">
       {/* background */}
       <img
-        src="/background/backgroundimg2.jpg"
+        src="/background/backgroundImage2.jpg"
         alt="Background"
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
