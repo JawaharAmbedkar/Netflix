@@ -108,11 +108,6 @@ export function VideoPlayer({
   const previousEpisode = () => setCurrentEpisode((value) => Math.max(1, value - 1)); 
   const nextEpisode = () => setCurrentEpisode((value) => Math.min(maxEpisodes, value + 1));
 
-  const handleShieldClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
   return (
     <div className="space-y-4">
       {sources.length ? (
@@ -142,22 +137,23 @@ export function VideoPlayer({
             allowFullScreen 
           />
 
+          {/* THE INTERCEPTION SHIELD CONTAINER */}
           {isShieldActive && (
-            <div 
-              onClick={handleShieldClick}
-              className="absolute inset-0 z-30 bg-black/40 flex flex-col items-center justify-center gap-3 p-4 backdrop-blur-sm cursor-default"
-            >
-              <p className="text-zinc-200 text-sm font-medium text-center">
+            <div className="absolute inset-0 z-30 bg-black/80 flex flex-col items-center justify-center gap-3 p-4 backdrop-blur-sm">
+              <p className="text-zinc-200 text-sm font-medium text-center max-w-xs">
                 Clicking inside streaming players often forces malicious tab redirects.
               </p>
               <button
                 type="button"
-                onClick={(e) => {
+                onTouchEnd={(e) => {
                   e.preventDefault();
-                  e.stopPropagation();
                   setIsShieldActive(false);
                 }}
-                className="rounded bg-red-600 px-4 py-2 text-xs font-semibold text-white shadow hover:bg-red-500 transition active:scale-95"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsShieldActive(false);
+                }}
+                className="rounded bg-red-600 px-5 py-2.5 text-xs font-semibold text-white shadow-lg hover:bg-red-500 transition active:scale-95"
               >
                 Unlock & Play Video Stream
               </button>
