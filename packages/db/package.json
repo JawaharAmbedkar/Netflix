@@ -7,7 +7,7 @@
     "generate": "prisma generate --schema=./prisma/schema.prisma"
   },
   "dependencies": {
-    "@prisma/client": "latest",
-    "prisma": "latest"
+    "@prisma/client": "6.17.0",
+    "prisma": "6.17.0"
   }
 }
