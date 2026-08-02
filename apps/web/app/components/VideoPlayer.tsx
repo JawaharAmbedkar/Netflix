@@ -77,7 +77,6 @@ export function VideoPlayer({
     [mediaType, id, currentSeason, currentEpisode]
   ); 
 
-  // 👇 GENERATES VIdSRC.TO CLEAN PARSED STREAM URLS
   const dynamicNexStreamUrl = useMemo(() => {
     const BASE_URL = "https://vidsrc.to"; 
 
@@ -91,45 +90,50 @@ export function VideoPlayer({
   const nextEpisode = () => setCurrentEpisode((value) => Math.min(maxEpisodes, value + 1));
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full">
       {sources.length ? (
-        <>
-          <video key={`${mediaKey}-${selectedSource}`} controls className="aspect-video w-full rounded-lg bg-black" src={sources[selectedSource]?.src}>
+        <div className="relative w-full rounded-lg bg-black overflow-hidden" style={{ paddingTop: '56.25%' }}>
+          <video key={`${mediaKey}-${selectedSource}`} controls className="absolute inset-0 w-full h-full" src={sources[selectedSource]?.src}>
             {captions.map((caption) => (
               <track key={caption.src} kind="subtitles" srcLang={caption.language} label={caption.label} src={caption.src} default={caption.default} />
             ))}
           </video>
-          <div className="flex flex-wrap gap-2">
+          <div className="absolute bottom-2 left-2 flex flex-wrap gap-2 z-10">
             {sources.map((source, index) => (
-              <button key={source.src} onClick={() => setSelectedSource(index)} className="rounded bg-zinc-800 px-3 py-2 hover:bg-zinc-700">
+              <button key={source.src} onClick={() => setSelectedSource(index)} className="rounded bg-zinc-800/80 backdrop-blur px-3 py-2 text-white hover:bg-zinc-700">
                 {source.label}
               </button>
             ))}
           </div>
-        </>
+        </div>
       ) : licensedEmbedUrl ? (
-        <iframe title="Licensed video player" src={licensedEmbedUrl} className="aspect-video w-full rounded-lg bg-black" allowFullScreen />
+        <div className="relative w-full rounded-lg bg-black overflow-hidden" style={{ paddingTop: '56.25%' }}>
+          <iframe title="Licensed video player" src={licensedEmbedUrl} className="absolute inset-0 w-full h-full border-0" allowFullScreen />
+        </div>
       ) : isMounted && dynamicNexStreamUrl ? (
-        /* 👇 CLEAN COMPLIANT PLAYER CONTAINER FRAME (NO SANDBOX CRASH RIGS) */
-        <div className="relative aspect-video w-full rounded-lg bg-black overflow-hidden">
+        /* 👇 THE FIXED MOBILE STRUCTURAL WRAPPER */
+        /* padding-top: 56.25% forces a true native 16:9 vertical responsive footprint across screens */
+        <div className="relative w-full rounded-lg bg-black overflow-hidden" style={{ paddingTop: '56.25%' }}>
           <iframe 
             key={dynamicNexStreamUrl}
             title="NexStream Player" 
             src={dynamicNexStreamUrl} 
-            className="w-full h-full border-0" 
+            className="absolute inset-0 w-full h-full border-0" /* 👈 Replaced w-full h-full with absolute layout */
             allowFullScreen 
             allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
           />
         </div>
       ) : (
-        <div className="flex aspect-video items-center justify-center rounded-lg bg-zinc-900 text-zinc-400">
-          Loading Stream Player...
+        <div className="relative w-full rounded-lg bg-zinc-900 text-zinc-400 flex items-center justify-center" style={{ paddingTop: '56.25%' }}>
+          <div className="absolute inset-0 flex items-center justify-center">
+            Loading Stream Player...
+          </div>
         </div>
       )}
 
       {/* DYNAMIC VALIDATED CONTROLS BAR */}
       {mediaType === 'tv' && (
-        <div className="flex flex-wrap items-center gap-4 bg-zinc-900/60 p-4 rounded-lg border border-zinc-800">
+        <div className="flex flex-wrap items-center gap-4 bg-zinc-900/60 p-4 rounded-lg border border-zinc-800 w-full">
           <div className="flex items-center gap-2">
             <button 
               disabled={currentSeason <= 1 || isLoadingMeta} 
