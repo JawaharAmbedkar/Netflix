@@ -93,10 +93,11 @@ export const authOptions: NextAuthOptions = {
       if (token.id) {
         const dbUser = await prisma.user.findUnique({
           where: { id: Number(token.id) }, 
-          select: { membership: true, amount: true },
+          select: { name: true, membership: true, amount: true },
         });
 
         if (dbUser) {
+          token.name = dbUser.name;
           token.membership = dbUser.membership;
           token.amount = dbUser.amount;
         }

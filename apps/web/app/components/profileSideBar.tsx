@@ -2,15 +2,18 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { useUser } from '../context/UserContext'; // adjust path if needed
 
 export default function ProfileSidebar() {
   const { name, setName } = useUser(); // use context instead of local session
+  const { update: updateSession } = useSession();
   const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState(name);
   const [showSavedMsg, setShowSavedMsg] = useState(false);
+  const [error, setError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -40,12 +43,19 @@ export default function ProfileSidebar() {
     setIsEditing(true);
     setInputValue(name);
     setShowSavedMsg(false);
+    setError('');
   };
 
   const handleSaveClick = async () => {
-    const trimmedName = inputValue.trim() || 'New User';
+    const trimmedName = inputValue.trim();
+    if (!trimmedName) {
+      setError('Please enter a name.');
+      return;
+    }
 
     try {
+      setIsSaving(true);
+      setError('');
       const res = await fetch('/api/update-name', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -55,16 +65,17 @@ export default function ProfileSidebar() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to update name');
 
-      // ✅ Update context instantly
-      setName(trimmedName);
-      setInputValue(trimmedName);
+      setName(data.name);
+      setInputValue(data.name);
+      await updateSession();
       setIsEditing(false);
       setShowSavedMsg(true);
     } catch (err) {
       console.error(err);
-      alert('Failed to update name in database');
-      setInputValue(name); // revert input to current context name
+      setError(err instanceof Error ? err.message : 'Failed to update name.');
       setShowSavedMsg(false);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -74,6 +85,11 @@ export default function ProfileSidebar() {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') handleSaveClick();
+    if (e.key === 'Escape') {
+      setInputValue(name);
+      setIsEditing(false);
+      setError('');
+    }
   };
 
   return (
@@ -117,8 +133,9 @@ export default function ProfileSidebar() {
                 type="button"
                 className="text-sm text-green-400 mt-1"
                 onClick={handleSaveClick}
+                disabled={isSaving}
               >
-                Save
+                {isSaving ? 'Saving...' : 'Save'}
               </button>
             ) : (
               <button
@@ -133,9 +150,10 @@ export default function ProfileSidebar() {
 
           {showSavedMsg && (
             <div className="text-xs text-yellow-400 mt-1">
-              Name updated! Log out and sign in again to see the permanent change.
+              Name updated!
             </div>
           )}
+          {error && <div className="text-xs text-red-400 mt-1">{error}</div>}
 
           <div className="text-m text-gray-400 mt-2">Netflix+ Member</div>
         </div>

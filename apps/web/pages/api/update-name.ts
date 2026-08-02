@@ -16,28 +16,23 @@ export default async function handler(
   try {
     const session = await getServerSession(req, res, authOptions);
 
-    if (!session?.user?.email) {
+    const userId = Number(session?.user?.id);
+    if (!Number.isInteger(userId) || userId <= 0) {
       return res.status(401).json({ error: "Not authenticated" });
     }
 
     const { name } = req.body;
-    if (!name || typeof name !== "string") {
+    if (typeof name !== "string") {
       return res.status(400).json({ error: "Invalid name" });
     }
-
-    // Ensure user exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!existingUser) {
-      return res.status(404).json({ error: "User not found" });
+    const normalizedName = name.trim();
+    if (!normalizedName || normalizedName.length > 100) {
+      return res.status(400).json({ error: "Name must be between 1 and 100 characters" });
     }
 
-    // Update only the name
     const updatedUser = await prisma.user.update({
-      where: { email: session.user.email },
-      data: { name },
+      where: { id: userId },
+      data: { name: normalizedName },
     });
 
     return res.status(200).json({ message: "Name updated", name: updatedUser.name });

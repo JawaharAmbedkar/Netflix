@@ -82,6 +82,7 @@ export const Navbar = () => {
 
           <ul className="flex space-x-3 text-white text-xs font-bold mt-1 md:space-x-5 md:text-sm lg:space-x-10 lg:text-lg">
             <li><Link href={"/Homepage"}>Home</Link></li>
+            <li><Link href={"/discover"}>Discover</Link></li>
             <li><Link href={"/Tv-Show"}>Tv shows</Link></li>
             <li><Link href={"/Movies"}>Movies</Link></li>
             <li><Link href={"/Anime"}>Anime</Link></li>
