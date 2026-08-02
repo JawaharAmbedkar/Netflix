@@ -33,7 +33,6 @@ export function VideoPlayer({
   const [currentSeason, setCurrentSeason] = useState(season); 
   const [currentEpisode, setCurrentEpisode] = useState(episode); 
   const [isMounted, setIsMounted] = useState(false);
-  const [isShieldActive, setIsShieldActive] = useState(true);
 
   const [seasonsList, setSeasonsList] = useState<SeasonData[]>([]);
   const [isLoadingMeta, setIsLoadingMeta] = useState(false);
@@ -42,7 +41,7 @@ export function VideoPlayer({
     setIsMounted(true);
   }, []);
 
-  // Fetch TMDB meta boundaries dynamically when show selection switches
+  // Sync TMDB metadata dynamically when selection modifies
   useEffect(() => {
     if (mediaType !== 'tv' || !id) return;
     
@@ -66,11 +65,6 @@ export function VideoPlayer({
     setCurrentEpisode(episode);
   }, [id, mediaType, season, episode]);
 
-  useEffect(() => {
-    setIsShieldActive(true);
-  }, [id, currentSeason, currentEpisode]);
-
-  // Extract total episode bounds for current choice layer safely
   const activeSeasonMeta = useMemo(() => {
     return seasonsList.find((s) => s.seasonNumber === currentSeason);
   }, [seasonsList, currentSeason]);
@@ -78,31 +72,19 @@ export function VideoPlayer({
   const maxEpisodes = activeSeasonMeta ? activeSeasonMeta.episodeCount : 100;
   const maxSeasons = seasonsList.length || 20;
 
-  useEffect(() => {
-    if (!isMounted) return;
-    const originalWindowOpen = window.open;
-    window.open = function (url) {
-      console.warn("Blocked an automatic ad/redirect tab to:", url);
-      return { focus: () => {}, blur: () => {}, close: () => {}, closed: true } as Window;
-    };
-    return () => { window.open = originalWindowOpen; };
-  }, [isMounted]);
-
   const mediaKey = useMemo(() => 
     mediaType === 'tv' ? `${id}/s${currentSeason}/e${currentEpisode}` : id, 
     [mediaType, id, currentSeason, currentEpisode]
   ); 
 
+  // 👇 GENERATES VIdSRC.TO CLEAN PARSED STREAM URLS
   const dynamicNexStreamUrl = useMemo(() => {
-    const BASE_URL = "https://api.codespecters.com"; 
-    const apiKey = process.env.NEXT_PUBLIC_EMBED_API_KEY;
-
-    if (!apiKey) return null;
+    const BASE_URL = "https://vidsrc.to"; 
 
     if (mediaType === 'tv') {
-      return `${BASE_URL}/embed/tv/${id}/${currentSeason}/${currentEpisode}?apikey=${apiKey}`;
+      return `${BASE_URL}/embed/tv/${id}/${currentSeason}/${currentEpisode}`;
     }
-    return `${BASE_URL}/embed/movie/${id}?apikey=${apiKey}`;
+    return `${BASE_URL}/embed/movie/${id}`;
   }, [mediaType, id, currentSeason, currentEpisode]);
 
   const previousEpisode = () => setCurrentEpisode((value) => Math.max(1, value - 1)); 
@@ -128,44 +110,16 @@ export function VideoPlayer({
       ) : licensedEmbedUrl ? (
         <iframe title="Licensed video player" src={licensedEmbedUrl} className="aspect-video w-full rounded-lg bg-black" allowFullScreen />
       ) : isMounted && dynamicNexStreamUrl ? (
+        /* 👇 CLEAN COMPLIANT PLAYER CONTAINER FRAME (NO SANDBOX CRASH RIGS) */
         <div className="relative aspect-video w-full rounded-lg bg-black overflow-hidden">
           <iframe 
             key={dynamicNexStreamUrl}
             title="NexStream Player" 
             src={dynamicNexStreamUrl} 
-            className="w-full h-full" 
+            className="w-full h-full border-0" 
             allowFullScreen 
+            allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
           />
-
-          {/* THE INTERCEPTION SHIELD CONTAINER */}
-          {isShieldActive && (
-            <div className="absolute inset-0 z-30 bg-black/80 flex flex-col items-center justify-center gap-3 p-4 backdrop-blur-sm">
-              <p className="text-zinc-200 text-sm font-medium text-center max-w-xs">
-                Clicking inside streaming players often forces malicious tab redirects.
-              </p>
-              <button
-                type="button"
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                  setIsShieldActive(false);
-                }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsShieldActive(false);
-                }}
-                className="rounded bg-red-600 px-5 py-2.5 text-xs font-semibold text-white shadow-lg hover:bg-red-500 transition active:scale-95"
-              >
-                Unlock & Play Video Stream
-              </button>
-            </div>
-          )}
-        </div>
-      ) : isMounted && !process.env.NEXT_PUBLIC_EMBED_API_KEY ? (
-        <div className="flex aspect-video flex-col items-center justify-center rounded-lg bg-red-950/20 border border-red-900/50 text-red-400 p-6 text-center">
-          <p className="font-semibold mb-1">NexStream Key Missing</p>
-          <p className="text-xs max-w-xs text-red-300/80">
-            Please append <code className="bg-black/40 px-1 py-0.5 rounded text-white text-[10px]">NEXT_PUBLIC_EMBED_API_KEY</code> to your root file configuration layout to activate playback.
-          </p>
         </div>
       ) : (
         <div className="flex aspect-video items-center justify-center rounded-lg bg-zinc-900 text-zinc-400">
@@ -173,11 +127,9 @@ export function VideoPlayer({
         </div>
       )}
 
-      {/* 👇 DYNAMIC VALIDATED CONTROLS BAR */}
+      {/* DYNAMIC VALIDATED CONTROLS BAR */}
       {mediaType === 'tv' && (
         <div className="flex flex-wrap items-center gap-4 bg-zinc-900/60 p-4 rounded-lg border border-zinc-800">
-          
-          {/* Season Controls Group */}
           <div className="flex items-center gap-2">
             <button 
               disabled={currentSeason <= 1 || isLoadingMeta} 
@@ -190,7 +142,6 @@ export function VideoPlayer({
               Season −
             </button>
             
-            {/* SELECT DROPDOWN FOR SEASONS */}
             <select
               disabled={isLoadingMeta || seasonsList.length === 0}
               value={currentSeason}
@@ -223,7 +174,6 @@ export function VideoPlayer({
             </button>
           </div>
 
-          {/* Episode Controls Group */}
           <div className="flex items-center gap-2">
             <button 
               disabled={currentEpisode <= 1 || isLoadingMeta} 
@@ -233,7 +183,6 @@ export function VideoPlayer({
               Episode −
             </button>
 
-            {/* SELECT DROPDOWN FOR EPISODES */}
             <select
               disabled={isLoadingMeta}
               value={currentEpisode}
@@ -256,8 +205,9 @@ export function VideoPlayer({
             </button>
           </div>
 
+          {isLoadingMeta && <span className="text-zinc-500 text-xs animate-pulse">Syncing episodes...</span>}
         </div>
       )}
     </div>
-  );
+  ); 
 }
