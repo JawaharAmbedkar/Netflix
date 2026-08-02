@@ -1,8 +1,12 @@
 // components/TopSearches.tsx
-'use client';
+"use client";
 
-import { Video } from "../videos/TopSearches/video"
-
+type Video = {
+  id: string | number;
+  url: string;
+  thumbnail: string;
+  title: string;
+};
 
 interface TopSearchesProps {
   videos: Video[];
@@ -13,7 +17,7 @@ export default function TopSearches({ videos }: TopSearchesProps) {
     <div className="col-span-1 p-4 border-l overflow-y-auto hidden lg:block">
       <h2 className="text-2xl font-bold mb-4 text-center">TOP SEARCHES</h2>
       <div className="flex flex-col gap-11">
-        {videos.map(video => (
+        {videos.map((video) => (
           <a
             key={video.id}
             href={video.url}
