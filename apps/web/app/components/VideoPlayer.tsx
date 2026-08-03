@@ -20,27 +20,32 @@ type Props = {
   licensedEmbedUrl?: string;
 };
 
-// 👇 A mix of different streaming providers to bypass ISP domain blocks
+// 👇 Completely distinct providers that are less likely to block Vercel or be blocked by Indian ISPs
 const SERVERS = [
   {
-    name: "Server 1 (VidSrc CC)",
+    name: "Server 1 (Embed.su)", // Currently one of the most reliable
     getUrl: (type: string, id: string, s: number, e: number) => 
-      type === 'tv' ? `https://vidsrc.cc/embed/tv/${id}/${s}/${e}` : `https://vidsrc.cc/embed/movie/${id}`
+      type === 'tv' ? `https://embed.su/embed/tv/${id}/${s}/${e}` : `https://embed.su/embed/movie/${id}`
   },
   {
-    name: "Server 2 (AutoEmbed)",
+    name: "Server 2 (VidLink)", // New fast provider
     getUrl: (type: string, id: string, s: number, e: number) => 
-      type === 'tv' ? `https://player.autoembed.cc/embed/tv/${id}/${s}/${e}` : `https://player.autoembed.cc/embed/movie/${id}`
+      type === 'tv' ? `https://vidlink.pro/tv/${id}/${s}/${e}` : `https://vidlink.pro/movie/${id}`
   },
   {
-    name: "Server 3 (MultiEmbed)",
+    name: "Server 3 (VidSrc IN)", // Specifically routed for Indian ISPs
     getUrl: (type: string, id: string, s: number, e: number) => 
-      type === 'tv' ? `https://multiembed.mov/direct/video.php?video_id=${id}&tmdb=1&s=${s}&e=${e}` : `https://multiembed.mov/direct/video.php?video_id=${id}&tmdb=1`
+      type === 'tv' ? `https://vidsrc.in/embed/tv/${id}/${s}/${e}` : `https://vidsrc.in/embed/movie/${id}`
   },
   {
-    name: "Server 4 (VidSrc ME)",
+    name: "Server 4 (VidSrc PM)", // Alternative unblocked mirror
     getUrl: (type: string, id: string, s: number, e: number) => 
-      type === 'tv' ? `https://vidsrc.me/embed/tv/${id}/${s}/${e}` : `https://vidsrc.me/embed/movie/${id}`
+      type === 'tv' ? `https://vidsrc.pm/embed/tv/${id}/${s}/${e}` : `https://vidsrc.pm/embed/movie/${id}`
+  },
+  {
+    name: "Server 5 (AutoEmbed)", // Different architecture
+    getUrl: (type: string, id: string, s: number, e: number) => 
+      type === 'tv' ? `https://autoembed.co/tv/tmdb/${id}-${s}-${e}` : `https://autoembed.co/movie/tmdb/${id}`
   }
 ];
 
@@ -60,15 +65,12 @@ export function VideoPlayer({
 
   const [seasonsList, setSeasonsList] = useState<SeasonData[]>([]);
   const [isLoadingMeta, setIsLoadingMeta] = useState(false);
-
-  // 👇 State to track the user's chosen server from the dropdown
   const [selectedServerIndex, setSelectedServerIndex] = useState(0);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Sync TMDB metadata dynamically when selection modifies
   useEffect(() => {
     if (mediaType !== 'tv' || !id) return;
 
@@ -104,18 +106,15 @@ export function VideoPlayer({
     [mediaType, id, currentSeason, currentEpisode]
   );
 
-  // 👇 Generate URL based on the user's chosen server
   const dynamicNexStreamUrl = useMemo(() => {
     const server = SERVERS[selectedServerIndex];
     if (!server) return "";
-    
     return server.getUrl(mediaType, id, currentSeason, currentEpisode);
   }, [mediaType, id, currentSeason, currentEpisode, selectedServerIndex]);
 
   const previousEpisode = () => setCurrentEpisode((value) => Math.max(1, value - 1));
   const nextEpisode = () => setCurrentEpisode((value) => Math.min(maxEpisodes, value + 1));
 
-  // Helper boolean to know if we are currently rendering the dynamic iframe player
   const isUsingDynamicPlayer = !sources.length && !licensedEmbedUrl && isMounted && dynamicNexStreamUrl;
 
   return (
@@ -149,7 +148,7 @@ export function VideoPlayer({
             className="absolute inset-0 w-full h-full border-0 block"
             allowFullScreen
             allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
-            referrerPolicy="origin"
+            referrerPolicy="no-referrer"
           />
         </div>
       ) : (
@@ -239,13 +238,12 @@ export function VideoPlayer({
                 </button>
               </div>
 
-              {isLoadingMeta && <span className="text-zinc-500 text-xs animate-pulse">Syncing episodes...</span>}
+              {isLoadingMeta && <span className="text-zinc-500 text-xs animate-pulse">Syncing...</span>}
             </div>
           ) : (
-            <div /> // Pushes the server dropdown to the right on movies
+            <div />
           )}
 
-          {/* 👇 Clickable Server Dropdown UI */}
           {isUsingDynamicPlayer && (
             <div className="flex items-center gap-2">
               <span className="text-zinc-400 text-xs font-medium hidden sm:inline-block">
@@ -255,7 +253,6 @@ export function VideoPlayer({
                 value={selectedServerIndex}
                 onChange={(e) => setSelectedServerIndex(Number(e.target.value))}
                 className="bg-zinc-800 text-zinc-200 rounded px-3 py-1.5 text-xs font-medium border border-zinc-700 focus:outline-none focus:border-zinc-500 hover:bg-zinc-700 transition-colors cursor-pointer"
-                title="Change server if the video isn't loading"
               >
                 {SERVERS.map((server, index) => (
                   <option key={server.name} value={index}>
