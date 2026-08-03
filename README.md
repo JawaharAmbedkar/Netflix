@@ -1,6 +1,5 @@
 🎬 Netflix Clone – Full Stack Membership-Based Streaming App
-
-A full-stack Netflix-inspired web application built with Next.js (Serverless) using a Turborepo Monorepo architecture, featuring authentication, protected routes, and a Razorpay-based membership payment system.
+A full-stack Netflix-inspired web application built with Next.js (Serverless) using a Turborepo Monorepo architecture. It features authentication, protected routes, a Razorpay-based membership payment system, and actual streaming functionality for movies, TV series, and anime.
 
 ⚠️ Important Notice (Google Sign-In Users)
 
@@ -12,31 +11,28 @@ The app is deployed on Vercel (Serverless Platform).
 
 When inactive, the backend goes into sleep mode.
 
-The first request may fail while the server "wakes up."
+The first request may fail while the server "wakes up."  
 
 ✅ Solution
+If Google Sign-In fails: Simply try again. It usually works within 2–3 attempts once the backend is active.  
 
-If Google Sign-In fails:
+📌 Project Overview  
+This project replicates the core Netflix user flow with real, working streaming capabilities:  
 
-Simply try again.
+User creates an account.  
 
-It usually works within 2–3 attempts once the backend is active.
+User completes membership payment.  
 
-📌 Project Overview
+User gains access to the homepage.  
 
-This project replicates the core Netflix user flow:
+Only active members can browse the catalog and watch actual movies, TV shows, and anime.  
 
-User creates an account
-
-User completes membership payment
-
-User gains access to the homepage
-
-Only active members can access protected content
-
-The goal of this project was to build a real-world full-stack production-style application with proper architecture and payment flow handling.
+The goal of this project was to build a real-world full-stack production-style application with proper architecture, payment flow handling, and third-party media API integrations.
 
 🚀 Features
+🍿 Real Streaming: Watch actual movies, TV series, and anime directly on the platform using the NexStream player.
+
+📽️ TMDB Integration: Dynamic catalog fetching real-time metadata, posters, episodes, and media details.
 
 🔐 Email & Password Authentication
 
@@ -57,7 +53,6 @@ The goal of this project was to build a real-world full-stack production-style a
 🎨 Netflix-inspired UI (Tailwind CSS + TypeScript)
 
 🧑‍💻 Tech Stack
-
 Framework: Next.js (App Router / Serverless)
 
 Monorepo: Turborepo
@@ -72,57 +67,54 @@ ORM: Prisma
 
 Authentication: NextAuth (Credentials + Google Provider)
 
-Payments: Razorpay (Test Mode)
+Payments: Razorpay (Test Mode)  
 
-Deployment: Vercel
+Media APIs: TMDB API & NexStream API  
 
-🔄 Application Flow
-1️⃣ Sign Up
+Deployment: Vercel  
 
-User creates an account using:
+🔄 Application Flow  
+1️⃣ Sign Up  
+User creates an account using:  
 
-Email & Password
-OR
+Email & Password  
 
-Google Sign-In
+OR Google Sign-In  
 
 After successful signup, the user is redirected to the membership page.
+(⚠️ If signing in with Google fails initially, try 2–3 times due to the Vercel cold start issue).  
 
-⚠️ If signing in with Google fails initially, try 2–3 times (Vercel cold start issue).
-
-2️⃣ Membership Payment
-
+2️⃣ Membership Payment  
 The application uses Razorpay Test Mode for demonstration purposes.
+How to Complete Payment:  
 
-How to Complete Payment:
+Click on "Pay"  
 
-Click on "Pay"
+Select any bank  
 
-Select any bank
+Choose the "Success" option  
 
-Choose the Success option
-
-Payment will be marked successful
+Payment will be marked successful  
 
 Membership status updates in the database
 
 User is redirected to the homepage
 
-This is a mock/test payment – no real money is charged.
+(This is a mock/test payment – no real money is charged).
 
 3️⃣ Homepage Access
-
 Only users with membership = true can access the homepage.
-
 If membership is inactive:
 
-User cannot access protected routes
+User cannot access protected routes.
 
-An error message is displayed on login
+An error message is displayed on login.  
 
-🏗 Project Architecture
+4️⃣ Watch Content  
+Once inside, users can browse categorized rows of Movies, Series, and Anime. Clicking on a title opens a dedicated player route where the NexStream API serves the actual video content based on the TMDB ID.  
 
-This project follows a Monorepo structure using Turborepo:
+🏗 Project Architecture  
+This project follows a Monorepo structure using Turborepo:  
 
 Shared database logic
 
@@ -133,69 +125,68 @@ Cleaner separation of concerns
 Production-ready structure
 
 ⚙️ Prisma & Vercel Challenges
-
 During development, one major challenge was:
-
 ❌ Prisma Global Client Issue in Serverless
+Vercel serverless functions do not handle global database instances the same way as traditional Node servers. This caused:  
 
-Vercel serverless functions do not handle global database instances the same way as traditional Node servers.
+Multiple Prisma client instances  
 
-This caused:
+Potential connection errors  
 
-Multiple Prisma client instances
+Deployment issues  
 
-Potential connection errors
+✅ Solution  
 
-Deployment issues
+Implemented proper Prisma client reuse pattern  
 
-✅ Solution
+Adjusted configuration for serverless compatibility  
 
-Implemented proper Prisma client reuse pattern
+Structured shared database client in the monorepo  
 
-Adjusted configuration for serverless compatibility
+This significantly improved reliability in production.  
 
-Structured shared database client in the monorepo
+🧠 What This Project Demonstrates  
+Third-party API integration (TMDB & Streaming servers)  
 
-This significantly improved reliability in production.
+Full-stack authentication flow  
 
-🧠 What This Project Demonstrates
+OAuth integration  
 
-Full-stack authentication flow
+Database relationships & membership logic  
 
-OAuth integration
+Payment verification flow  
 
-Database relationships & membership logic
+Protected routing  
 
-Payment verification flow
+Serverless deployment challenges  
 
-Protected routing
+Monorepo architecture management  
 
-Serverless deployment challenges
+Real-world debugging experience  
 
-Monorepo architecture management
-
-Real-world debugging experience
-
-🛠 Setup (Local Development)
+🛠 Setup (Local Development)  
+Bash
 # Install dependencies
 npm install
 
 # Run development server
 npm run dev
+Environment Variables Required:
+Create a .env file in the appropriate apps/packages and configure the following:  
 
-Make sure you configure:
+DATABASE_URL (PostgreSQL connection string)  
 
-Database URL
+NEXTAUTH_SECRET
 
-NextAuth secret
+GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET
 
-Google OAuth credentials
+RAZORPAY_KEY_ID & RAZORPAY_KEY_SECRET
 
-Razorpay test keys
+TMDB_READ_ACCESS_TOKEN (From The Movie Database)
+
+NEXT_PUBLIC_EMBED_API_KEY (For NexStream)
 
 🔔 Final Reminder
-
 If Google Sign-In shows an error:
-
 👉 Try 2–3 times.
 The backend may still be waking up on Vercel.
