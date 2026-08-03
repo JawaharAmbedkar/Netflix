@@ -20,6 +20,15 @@ type Props = {
   licensedEmbedUrl?: string;
 };
 
+// 👇 Mirrors ordered from least blocked to most commonly blocked
+const MIRRORS = [
+  "https://vidsrc.cc",
+  "https://vidsrc.me",
+  "https://vidsrc.net",
+  "https://vidsrc.to",
+  "https://vidsrc.in"
+];
+
 export function VideoPlayer({ 
   mediaType, 
   id, 
@@ -36,6 +45,9 @@ export function VideoPlayer({
 
   const [seasonsList, setSeasonsList] = useState<SeasonData[]>([]);
   const [isLoadingMeta, setIsLoadingMeta] = useState(false);
+
+  // 👇 State to track which VidSrc mirror is currently active
+  const [mirrorIndex, setMirrorIndex] = useState(0);
 
   useEffect(() => {
     setIsMounted(true);
@@ -77,18 +89,22 @@ export function VideoPlayer({
     [mediaType, id, currentSeason, currentEpisode]
   ); 
 
-  // 👇 GENERATES CLEAN STABLE UN-SANDBOXED LINKS VIA VIDSRC.TO
+  // 👇 Dynamically uses the currently selected mirror
   const dynamicNexStreamUrl = useMemo(() => {
-    const BASE_URL = "https://vidsrc.to"; 
+    const baseUrl = MIRRORS[mirrorIndex]; 
 
     if (mediaType === 'tv') {
-      return `${BASE_URL}/embed/tv/${id}/${currentSeason}/${currentEpisode}`;
+      return `${baseUrl}/embed/tv/${id}/${currentSeason}/${currentEpisode}`;
     }
-    return `${BASE_URL}/embed/movie/${id}`;
-  }, [mediaType, id, currentSeason, currentEpisode]);
+    return `${baseUrl}/embed/movie/${id}`;
+  }, [mediaType, id, currentSeason, currentEpisode, mirrorIndex]);
 
   const previousEpisode = () => setCurrentEpisode((value) => Math.max(1, value - 1)); 
   const nextEpisode = () => setCurrentEpisode((value) => Math.min(maxEpisodes, value + 1));
+
+  const cycleMirror = () => {
+    setMirrorIndex((prev) => (prev + 1) % MIRRORS.length);
+  };
 
   return (
     <div className="space-y-4 w-full">
@@ -100,7 +116,14 @@ export function VideoPlayer({
           src={sources[selectedSource]?.src}
         >
           {captions.map((caption) => (
-            <track key={caption.src} kind="subtitles" srcLang={caption.language} label={caption.label} src={caption.src} default={caption.default} />
+            <track 
+              key={caption.src} 
+              kind="subtitles" 
+              srcLang={caption.language} 
+              label={caption.label} 
+              src={caption.src} 
+              default={caption.default} 
+            />
           ))}
         </video>
       ) : licensedEmbedUrl ? (
@@ -113,8 +136,6 @@ export function VideoPlayer({
           />
         </div>
       ) : isMounted && dynamicNexStreamUrl ? (
-        /* 👇 THE FIXED RESPONSIVE WRAPPER */
-        /* Sandboxing is entirely removed to clear the 404 sbx anti-tamper crash loop */
         <div className="relative w-full aspect-video rounded-lg bg-black overflow-hidden border border-zinc-800">
           <iframe 
             key={dynamicNexStreamUrl}
@@ -123,6 +144,7 @@ export function VideoPlayer({
             className="absolute inset-0 w-full h-full border-0 block" 
             allowFullScreen 
             allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
+            referrerPolicy="origin"
           />
         </div>
       ) : (
@@ -131,87 +153,107 @@ export function VideoPlayer({
         </div>
       )}
 
-      {/* DYNAMIC VALIDATED CONTROLS BAR */}
-      {mediaType === 'tv' && (
-        <div className="flex flex-wrap items-center gap-4 bg-zinc-900/60 p-4 rounded-lg border border-zinc-800 w-full">
-          <div className="flex items-center gap-2">
-            <button 
-              disabled={currentSeason <= 1 || isLoadingMeta} 
-              onClick={() => {
-                setCurrentSeason((v) => Math.max(1, v - 1));
-                setCurrentEpisode(1);
-              }} 
-              className="rounded bg-zinc-800 px-3 py-1.5 text-white hover:bg-zinc-700 disabled:opacity-40 text-xs font-medium"
-            >
-              Season −
-            </button>
-            
-            <select
-              disabled={isLoadingMeta || seasonsList.length === 0}
-              value={currentSeason}
-              onChange={(e) => {
-                setCurrentSeason(Number(e.target.value));
-                setCurrentEpisode(1);
-              }}
-              className="bg-zinc-800 text-white rounded px-2 py-1.5 text-xs font-medium border border-zinc-700 focus:outline-none"
-            >
-              {seasonsList.length > 0 ? (
-                seasonsList.map((s) => (
-                  <option key={s.seasonNumber} value={s.seasonNumber}>
-                    {s.name || `Season ${s.seasonNumber}`}
+      {/* CONTROLS BAR: Episodes & Server Switcher */}
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-zinc-900/60 p-4 rounded-lg border border-zinc-800 w-full">
+        {mediaType === 'tv' ? (
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <button 
+                disabled={currentSeason <= 1 || isLoadingMeta} 
+                onClick={() => {
+                  setCurrentSeason((v) => Math.max(1, v - 1));
+                  setCurrentEpisode(1);
+                }} 
+                className="rounded bg-zinc-800 px-3 py-1.5 text-white hover:bg-zinc-700 disabled:opacity-40 text-xs font-medium"
+              >
+                Season −
+              </button>
+              
+              <select
+                disabled={isLoadingMeta || seasonsList.length === 0}
+                value={currentSeason}
+                onChange={(e) => {
+                  setCurrentSeason(Number(e.target.value));
+                  setCurrentEpisode(1);
+                }}
+                className="bg-zinc-800 text-white rounded px-2 py-1.5 text-xs font-medium border border-zinc-700 focus:outline-none"
+              >
+                {seasonsList.length > 0 ? (
+                  seasonsList.map((s) => (
+                    <option key={s.seasonNumber} value={s.seasonNumber}>
+                      {s.name || `Season ${s.seasonNumber}`}
+                    </option>
+                  ))
+                ) : (
+                  <option value={currentSeason}>Season {currentSeason}</option>
+                )}
+              </select>
+
+              <button 
+                disabled={currentSeason >= maxSeasons || isLoadingMeta} 
+                onClick={() => {
+                  setCurrentSeason((v) => Math.min(maxSeasons, v + 1));
+                  setCurrentEpisode(1);
+                }} 
+                className="rounded bg-zinc-800 px-3 py-1.5 text-white hover:bg-zinc-700 disabled:opacity-40 text-xs font-medium"
+              >
+                Season +
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button 
+                disabled={currentEpisode <= 1 || isLoadingMeta} 
+                onClick={previousEpisode} 
+                className="rounded bg-zinc-800 px-3 py-1.5 text-white hover:bg-zinc-700 disabled:opacity-40 text-xs font-medium"
+              >
+                Episode −
+              </button>
+
+              <select
+                disabled={isLoadingMeta}
+                value={currentEpisode}
+                onChange={(e) => setCurrentEpisode(Number(e.target.value))}
+                className="bg-zinc-800 text-white rounded px-2 py-1.5 text-xs font-medium border border-zinc-700 focus:outline-none min-w-[70px]"
+              >
+                {Array.from({ length: maxEpisodes }, (_, i) => i + 1).map((epNum) => (
+                  <option key={epNum} value={epNum}>
+                    Episode {epNum}
                   </option>
-                ))
-              ) : (
-                <option value={currentSeason}>Season {currentSeason}</option>
-              )}
-            </select>
+                ))}
+              </select>
 
-            <button 
-              disabled={currentSeason >= maxSeasons || isLoadingMeta} 
-              onClick={() => {
-                setCurrentSeason((v) => Math.min(maxSeasons, v + 1));
-                setCurrentEpisode(1);
-              }} 
-              className="rounded bg-zinc-800 px-3 py-1.5 text-white hover:bg-zinc-700 disabled:opacity-40 text-xs font-medium"
+              <button 
+                disabled={currentEpisode >= maxEpisodes || isLoadingMeta} 
+                onClick={nextEpisode} 
+                className="rounded bg-zinc-800 px-3 py-1.5 text-white hover:bg-zinc-700 disabled:opacity-40 text-xs font-medium"
+              >
+                Episode +
+              </button>
+            </div>
+
+            {isLoadingMeta && <span className="text-zinc-500 text-xs animate-pulse">Syncing episodes...</span>}
+          </div>
+        ) : (
+          <span className="text-zinc-400 text-xs font-medium">Movie Player</span>
+        )}
+
+        {/* 👇 SERVER SWITCHER: Lets mobile users bypass ISP blocks easily */}
+        {!sources.length && !licensedEmbedUrl && (
+          <div className="flex items-center gap-2 ml-auto">
+            <span className="text-zinc-500 text-xs hidden sm:inline">
+              Server {mirrorIndex + 1}/{MIRRORS.length}
+            </span>
+            <button
+              onClick={cycleMirror}
+              className="rounded bg-zinc-800 border border-zinc-700 px-3 py-1.5 text-white hover:bg-zinc-700 text-xs font-medium transition-colors"
+              title="Click if video fails to load on mobile networks"
             >
-              Season +
+              Switch Server 🔄
             </button>
           </div>
-
-          <div className="flex items-center gap-2">
-            <button 
-              disabled={currentEpisode <= 1 || isLoadingMeta} 
-              onClick={previousEpisode} 
-              className="rounded bg-zinc-800 px-3 py-1.5 text-white hover:bg-zinc-700 disabled:opacity-40 text-xs font-medium"
-            >
-              Episode −
-            </button>
-
-            <select
-              disabled={isLoadingMeta}
-              value={currentEpisode}
-              onChange={(e) => setCurrentEpisode(Number(e.target.value))}
-              className="bg-zinc-800 text-white rounded px-2 py-1.5 text-xs font-medium border border-zinc-700 focus:outline-none min-w-[70px]"
-            >
-              {Array.from({ length: maxEpisodes }, (_, i) => i + 1).map((epNum) => (
-                <option key={epNum} value={epNum}>
-                  Episode {epNum}
-                </option>
-              ))}
-            </select>
-
-            <button 
-              disabled={currentEpisode >= maxEpisodes || isLoadingMeta} 
-              onClick={nextEpisode} 
-              className="rounded bg-zinc-800 px-3 py-1.5 text-white hover:bg-zinc-700 disabled:opacity-40 text-xs font-medium"
-            >
-              Episode +
-            </button>
-          </div>
-
-          {isLoadingMeta && <span className="text-zinc-500 text-xs animate-pulse">Syncing episodes...</span>}
-        </div>
-      )}
+        )}
+      </div>
     </div>
   ); 
 }
