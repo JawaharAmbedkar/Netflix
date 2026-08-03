@@ -77,6 +77,7 @@ export function VideoPlayer({
     [mediaType, id, currentSeason, currentEpisode]
   ); 
 
+  // 👇 GENERATES CLEAN STABLE UN-SANDBOXED LINKS VIA VIDSRC.TO
   const dynamicNexStreamUrl = useMemo(() => {
     const BASE_URL = "https://vidsrc.to"; 
 
@@ -92,42 +93,41 @@ export function VideoPlayer({
   return (
     <div className="space-y-4 w-full">
       {sources.length ? (
-        <div className="relative w-full rounded-lg bg-black overflow-hidden" style={{ paddingTop: '56.25%' }}>
-          <video key={`${mediaKey}-${selectedSource}`} controls className="absolute inset-0 w-full h-full" src={sources[selectedSource]?.src}>
-            {captions.map((caption) => (
-              <track key={caption.src} kind="subtitles" srcLang={caption.language} label={caption.label} src={caption.src} default={caption.default} />
-            ))}
-          </video>
-          <div className="absolute bottom-2 left-2 flex flex-wrap gap-2 z-10">
-            {sources.map((source, index) => (
-              <button key={source.src} onClick={() => setSelectedSource(index)} className="rounded bg-zinc-800/80 backdrop-blur px-3 py-2 text-white hover:bg-zinc-700">
-                {source.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <video 
+          key={`${mediaKey}-${selectedSource}`} 
+          controls 
+          className="aspect-video w-full h-auto rounded-lg bg-black object-cover" 
+          src={sources[selectedSource]?.src}
+        >
+          {captions.map((caption) => (
+            <track key={caption.src} kind="subtitles" srcLang={caption.language} label={caption.label} src={caption.src} default={caption.default} />
+          ))}
+        </video>
       ) : licensedEmbedUrl ? (
-        <div className="relative w-full rounded-lg bg-black overflow-hidden" style={{ paddingTop: '56.25%' }}>
-          <iframe title="Licensed video player" src={licensedEmbedUrl} className="absolute inset-0 w-full h-full border-0" allowFullScreen />
+        <div className="relative w-full aspect-video rounded-lg bg-black overflow-hidden">
+          <iframe 
+            title="Licensed video player" 
+            src={licensedEmbedUrl} 
+            className="absolute inset-0 w-full h-full border-0" 
+            allowFullScreen 
+          />
         </div>
       ) : isMounted && dynamicNexStreamUrl ? (
-        /* 👇 THE FIXED MOBILE STRUCTURAL WRAPPER */
-        /* padding-top: 56.25% forces a true native 16:9 vertical responsive footprint across screens */
-        <div className="relative w-full rounded-lg bg-black overflow-hidden" style={{ paddingTop: '56.25%' }}>
+        /* 👇 THE FIXED RESPONSIVE WRAPPER */
+        /* Sandboxing is entirely removed to clear the 404 sbx anti-tamper crash loop */
+        <div className="relative w-full aspect-video rounded-lg bg-black overflow-hidden border border-zinc-800">
           <iframe 
             key={dynamicNexStreamUrl}
             title="NexStream Player" 
             src={dynamicNexStreamUrl} 
-            className="absolute inset-0 w-full h-full border-0" /* 👈 Replaced w-full h-full with absolute layout */
+            className="absolute inset-0 w-full h-full border-0 block" 
             allowFullScreen 
             allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
           />
         </div>
       ) : (
-        <div className="relative w-full rounded-lg bg-zinc-900 text-zinc-400 flex items-center justify-center" style={{ paddingTop: '56.25%' }}>
-          <div className="absolute inset-0 flex items-center justify-center">
-            Loading Stream Player...
-          </div>
+        <div className="aspect-video w-full flex items-center justify-center rounded-lg bg-zinc-900 text-zinc-400 font-medium text-sm border border-zinc-800">
+          Loading Stream Player...
         </div>
       )}
 
