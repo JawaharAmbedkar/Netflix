@@ -78,33 +78,34 @@ export const Navbar = () => {
       }`}
     >
       <div className="mx-auto flex max-w-[1500px] items-center justify-between px-4 py-4 sm:px-8 lg:px-12">
-        {/* Mobile */}
-        <div className="flex w-full items-center justify-between sm:hidden">
-          <Link href="/" className="transition-opacity hover:opacity-80">
-            <img src="/png/series/netflix.png" alt="Netflix" className="h-7 w-auto" />
-          </Link>
-          <div className="flex items-center gap-2">
-            <SearchBar />
-            <div className="relative" ref={notifRef}>
-              <button
-                type="button"
-                onClick={() => setNotifOpen(!notifOpen)}
-                aria-label="Notifications"
-                className="rounded-xl p-2 text-warm-200 transition hover:bg-white/[0.06] hover:text-white"
-              >
-                <BellIcon />
-              </button>
-              <NotificationDropdown open={notifOpen} />
+        {/* Mobile and tablet */}
+        <div className="w-full space-y-3 xl:hidden">
+          <div className="flex items-center justify-between gap-3">
+            <Link href="/" className="shrink-0 transition-opacity hover:opacity-80">
+              <img src="/png/series/netflix.png" alt="Netflix" className="h-7 w-auto" />
+            </Link>
+            <div className="flex shrink-0 items-center gap-2">
+              <div className="relative" ref={notifRef}>
+                <button
+                  type="button"
+                  onClick={() => setNotifOpen(!notifOpen)}
+                  aria-label="Notifications"
+                  className="rounded-xl p-2 text-warm-200 transition hover:bg-white/[0.06] hover:text-white"
+                >
+                  <BellIcon />
+                </button>
+                <NotificationDropdown open={notifOpen} />
+              </div>
+              <ProfileSidebar />
             </div>
-            <ProfileSidebar />
           </div>
+          <SearchBar />
         </div>
-
         {/* Desktop */}
-        <div className="hidden w-full items-center justify-between sm:flex">
+        <div className="hidden w-full items-center justify-between xl:flex">
           <div className="flex items-center gap-10">
-            <Link href="/" className="transition-opacity hover:opacity-80">
-              <img src="/png/series/netflix.png" alt="Netflix" className="h-8 w-auto lg:h-9" />
+            <Link href="/" className="shrink-0 transition-opacity hover:opacity-80">
+              <img src="/png/series/netflix.png" alt="Netflix" className="h-8 w-auto xl:h-9" />
             </Link>
             <nav aria-label="Main navigation">
               <ul className="flex items-center gap-1 lg:gap-2">

@@ -80,7 +80,7 @@ export default function SearchBar() {
   const hasDropdownContent = isSearching || results.length > 0 || message;
 
   return (
-    <div className="relative z-50 w-full max-w-[200px] sm:max-w-xs lg:max-w-sm" ref={containerRef}>
+    <div className="relative z-50 w-full max-w-none xl:max-w-sm" ref={containerRef}>
       <div className="relative">
         <svg
           className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-warm-400"
@@ -123,7 +123,7 @@ export default function SearchBar() {
       </div>
 
       {showSuggestions && hasDropdownContent ? (
-        <div className="absolute mt-2 w-[280px] overflow-hidden rounded-2xl border border-white/[0.08] bg-canvas-elevated/95 text-sm shadow-card backdrop-blur-2xl sm:w-full">
+        <div className="absolute right-0 mt-2 w-full overflow-hidden rounded-2xl border border-white/[0.08] bg-canvas-elevated/95 text-sm shadow-card backdrop-blur-2xl xl:left-0 xl:right-auto">
           {isSearching ? (
             <div className="flex items-center gap-3 px-4 py-4">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-gold/20 border-t-gold" />
