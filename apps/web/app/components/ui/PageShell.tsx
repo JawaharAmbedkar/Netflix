@@ -16,8 +16,8 @@ export function PageShell({ children, withFooter = true, className = '', fullWid
       <div
         className={
           fullWidth
-            ? 'pb-24 sm:pb-20'
-            : 'mx-auto max-w-[1500px] px-4 pb-24 sm:px-8 sm:pb-20 lg:px-12'
+            ? 'pb-40 sm:pb-20'
+            : 'mx-auto max-w-[1500px] px-4 pb-40 sm:px-8 sm:pb-20 lg:px-12'
         }
       >
         {children}
