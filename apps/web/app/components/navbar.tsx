@@ -1,15 +1,55 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
-import ProfileSidebar from "./profileSideBar";
-import SearchBar from "./search";
-import Link from 'next/link';
 
+import { useState, useRef, useEffect } from 'react';
+import ProfileSidebar from './profileSideBar';
+import SearchBar from './search';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+const navLinks = [
+  { href: '/Homepage', label: 'Home' },
+  { href: '/discover', label: 'Discover' },
+  { href: '/Tv-Show', label: 'TV Shows' },
+  { href: '/Movies', label: 'Movies' },
+  { href: '/Anime', label: 'Anime' },
+];
+
+function BellIcon({ className = 'w-5 h-5' }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={className}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+    </svg>
+  );
+}
+
+function NotificationDropdown({ open }: { open: boolean }) {
+  return (
+    <div
+      className={`
+        absolute right-0 mt-3 w-64 origin-top-right overflow-hidden rounded-2xl glass-strong shadow-card transition-all duration-300 ease-out
+        ${open ? 'scale-100 opacity-100' : 'pointer-events-none scale-95 opacity-0'}
+      `}
+    >
+      <div className="border-b border-white/[0.06] px-4 py-3">
+        <p className="text-xs font-semibold uppercase tracking-wider text-gold">Notifications</p>
+      </div>
+      <div className="px-4 py-8 text-center">
+        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.05]">
+          <BellIcon className="h-5 w-5 text-warm-400" />
+        </div>
+        <p className="text-sm text-warm-300">All caught up</p>
+        <p className="mt-1 text-xs text-warm-500">No new notifications</p>
+      </div>
+    </div>
+  );
+}
 
 export const Navbar = () => {
   const [notifOpen, setNotifOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
-  // Close notification dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
@@ -20,109 +60,85 @@ export const Navbar = () => {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const isActive = (href: string) => {
+    if (href === '/Homepage') return pathname === '/' || pathname === '/Homepage';
+    return pathname?.startsWith(href);
+  };
+
   return (
-    <div className="flex justify-between items-center py-5 px-8 pb-2 w-full ">
-      
-      {/* -------- Mobile Navbar (<sm) -------- */}
-      <div className="flex justify-between items-center w-full sm:hidden">
-        <Link href={"/"}>
-          <img
-            src="/png/series/netflix.png"
-            alt="netflix"
-            className="w-[70px] mr-8 sm:w-[90px] sm:mr-5"
-          />
-        </Link>
-
-        {/* Mobile Right: Search + Bell + Profile */}
-        <div className="w-[220px] flex items-center relative m:w-[300px]">
-          <SearchBar />
-
-          {/* Notification Bell */}
-          <div className="ml-3 relative" ref={notifRef}>
-            <div
-              onClick={() => setNotifOpen(!notifOpen)}
-              className="cursor-pointer text-white"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round"
-                  d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 
-                    8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 
-                    0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-              </svg>
-            </div>
-
-            {/* Dropdown */}
-            <div className={`
-              absolute right-0 mt-2 w-52 bg-black text-white rounded-lg shadow-lg transition-all duration-300 ease-out z-50
-              transform origin-top-right
-              ${notifOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}
-            `}>
-              <div className="p-4 border-b border-gray-700 font-medium text-center">
-                No notifications
-              </div>
-            </div>
-          </div>
-
-          <ProfileSidebar />
-        </div>
-      </div>
-
-      {/* -------- Desktop Navbar (≥sm) -------- */}
-      <div className="hidden sm:flex justify-between items-center w-full">
-        {/* Left: Logo + Nav Links */}
-        <div className="flex items-center">
-          <Link href={"/"}>
-            <img
-              src="/png/series/netflix.png"
-              alt="netflix"
-              className="w-[100px] mr-5 lg:w-[120px] lg:mr-8"
-            />
+    <header
+      className={`sticky top-0 z-50 transition-all duration-500 ${
+        scrolled ? 'glass-nav shadow-glass' : 'bg-transparent'
+      }`}
+    >
+      <div className="mx-auto flex max-w-[1500px] items-center justify-between px-4 py-4 sm:px-8 lg:px-12">
+        {/* Mobile */}
+        <div className="flex w-full items-center justify-between sm:hidden">
+          <Link href="/" className="transition-opacity hover:opacity-80">
+            <img src="/png/series/netflix.png" alt="Netflix" className="h-7 w-auto" />
           </Link>
-
-          <ul className="flex space-x-3 text-white text-xs font-bold mt-1 md:space-x-5 md:text-sm lg:space-x-10 lg:text-lg">
-            <li><Link href={"/Homepage"}>Home</Link></li>
-            <li><Link href={"/discover"}>Discover</Link></li>
-            <li><Link href={"/Tv-Show"}>Tv shows</Link></li>
-            <li><Link href={"/Movies"}>Movies</Link></li>
-            <li><Link href={"/Anime"}>Anime</Link></li>
-          </ul>
+          <div className="flex items-center gap-2">
+            <SearchBar />
+            <div className="relative" ref={notifRef}>
+              <button
+                type="button"
+                onClick={() => setNotifOpen(!notifOpen)}
+                aria-label="Notifications"
+                className="rounded-xl p-2 text-warm-200 transition hover:bg-white/[0.06] hover:text-white"
+              >
+                <BellIcon />
+              </button>
+              <NotificationDropdown open={notifOpen} />
+            </div>
+            <ProfileSidebar />
+          </div>
         </div>
 
-        {/* Right: Search + Bell + Profile */}
-        <div className="w-[240px] flex items-center relative m:w-[300px]">
-          <SearchBar />
-
-          <div className="ml-3 relative" ref={notifRef}>
-            <div
-              onClick={() => setNotifOpen(!notifOpen)}
-              className="cursor-pointer text-white"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round"
-                  d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 
-                    8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 
-                    8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 
-                    1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 
-                    0a3 3 0 1 1-5.714 0" />
-              </svg>
-            </div>
-
-            <div className={`
-              absolute right-0 mt-2 w-52 bg-black text-white rounded-lg shadow-lg transition-all duration-300 ease-out z-50
-              transform origin-top-right
-              ${notifOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}
-            `}>
-              <div className="p-4 border-b border-gray-700 font-medium text-center">
-                No notifications
-              </div>
-            </div>
+        {/* Desktop */}
+        <div className="hidden w-full items-center justify-between sm:flex">
+          <div className="flex items-center gap-10">
+            <Link href="/" className="transition-opacity hover:opacity-80">
+              <img src="/png/series/netflix.png" alt="Netflix" className="h-8 w-auto lg:h-9" />
+            </Link>
+            <nav aria-label="Main navigation">
+              <ul className="flex items-center gap-1 lg:gap-2">
+                {navLinks.map(({ href, label }) => (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      className={`nav-link rounded-xl px-3 py-2 lg:px-4 ${isActive(href) ? 'nav-link-active bg-white/[0.06]' : ''}`}
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
 
-          <ProfileSidebar />
+          <div className="flex items-center gap-3">
+            <SearchBar />
+            <div className="relative" ref={notifRef}>
+              <button
+                type="button"
+                onClick={() => setNotifOpen(!notifOpen)}
+                aria-label="Notifications"
+                className="rounded-xl p-2.5 text-warm-200 transition hover:bg-white/[0.06] hover:text-white"
+              >
+                <BellIcon />
+              </button>
+              <NotificationDropdown open={notifOpen} />
+            </div>
+            <ProfileSidebar />
+          </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 };

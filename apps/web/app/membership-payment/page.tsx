@@ -3,7 +3,11 @@
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import Link from 'next/link';
+import {
+  AuthPageShell,
+  authPrimaryButtonClass,
+} from '../components/ui/AuthPageShell';
 
 const PAYMENT_AMOUNT = 149;
 
@@ -12,7 +16,6 @@ export default function MembershipPayment() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  // Redirect if already has membership
   useEffect(() => {
     if (status === 'authenticated' && session?.user?.membership) {
       router.replace('/');
@@ -20,11 +23,21 @@ export default function MembershipPayment() {
   }, [status, session, router]);
 
   if (status === 'loading') {
-    return <div className="min-h-screen flex items-center justify-center text-white">Loading...</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-canvas text-warm-300">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-gold/20 border-t-gold" />
+      </div>
+    );
   }
 
   if (!session) {
-    return <div className="min-h-screen flex items-center justify-center text-white">Please sign in to make a payment.</div>;
+    return (
+      <AuthPageShell title="Sign in required" subtitle="Please sign in before completing membership." label="Membership">
+        <Link href="/signin" className={`${authPrimaryButtonClass} inline-block text-center`}>
+          Go to sign in
+        </Link>
+      </AuthPageShell>
+    );
   }
 
   const loadRazorpayScript = () =>
@@ -50,7 +63,6 @@ export default function MembershipPayment() {
     }
 
     try {
-      // Create order
       const orderRes = await fetch('/api/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -85,7 +97,7 @@ export default function MembershipPayment() {
             const verifyData = await verifyRes.json();
 
             if (verifyRes.ok && verifyData.success) {
-              await update?.(); // refresh session
+              await update?.();
               router.push('/');
             } else {
               alert('Payment verification failed. Please contact support.');
@@ -98,7 +110,7 @@ export default function MembershipPayment() {
           }
         },
         prefill: { email: session.user.email ?? '' },
-        theme: { color: '#e50914' },
+        theme: { color: '#c9a962' },
       };
 
       const rzp = new (window as any).Razorpay(options);
@@ -117,18 +129,46 @@ export default function MembershipPayment() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white p-6">
-      <img className="sm:w-48 sm:m-3" src="/png/series/netflix.png" alt="Netflix" />
-      <h1 className="text-2xl sm:text-3xl font-semibold my-6 text-center">
-        Complete your Netflix membership payment
-      </h1>
+    <AuthPageShell
+      title="Activate membership"
+      subtitle="Complete a one-time payment to unlock streaming. Razorpay test mode is enabled for demo checkout."
+      label="Premium access"
+    >
+      <div className="rounded-3xl border border-white/[0.08] bg-white/[0.04] p-5">
+        <p className="text-xs uppercase tracking-[0.2em] text-warm-500">Plan</p>
+        <p className="mt-2 font-display text-2xl text-white">Full catalogue access</p>
+        <div className="mt-4 flex items-end justify-between border-t border-white/[0.06] pt-4">
+          <span className="text-sm text-warm-400">Total due today</span>
+          <span className="font-display text-3xl text-gold-light">₹{PAYMENT_AMOUNT}</span>
+        </div>
+      </div>
+
+      <ul className="mt-5 space-y-2 text-sm text-warm-300">
+        <li className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-gold" />
+          Unlimited movies, series & anime
+        </li>
+        <li className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-gold" />
+          HD streaming on all devices
+        </li>
+        <li className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-gold" />
+          Secure checkout via Razorpay
+        </li>
+      </ul>
+
       <button
         disabled={loading}
         onClick={handlePayment}
-        className="bg-red-600 hover:bg-red-700 px-6 py-3 rounded font-bold disabled:opacity-50"
+        className={`${authPrimaryButtonClass} mt-8`}
       >
-        {loading ? 'Processing...' : `Pay ₹${PAYMENT_AMOUNT}`}
+        {loading ? 'Processing…' : `Pay ₹${PAYMENT_AMOUNT}`}
       </button>
-    </div>
+
+      <p className="mt-4 text-center text-xs text-warm-500">
+        Test cards work in Razorpay sandbox mode.
+      </p>
+    </AuthPageShell>
   );
 }

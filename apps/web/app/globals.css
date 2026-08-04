@@ -2,6 +2,92 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-warm-100 antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201, 169, 98, 0.06), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(201, 169, 98, 0.03), transparent);
+  }
+
+  ::selection {
+    background-color: rgba(201, 169, 98, 0.3);
+    color: white;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply border border-white/[0.08] bg-white/[0.04] backdrop-blur-xl;
+  }
+
+  .glass-strong {
+    @apply border border-white/[0.12] bg-white/[0.08] backdrop-blur-2xl shadow-glass;
+  }
+
+  .glass-nav {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background-color: rgba(10, 9, 8, 0.7);
+    @apply backdrop-blur-2xl;
+  }
+
+  .text-gradient-gold {
+    @apply bg-gradient-to-r from-gold-light via-gold to-gold-muted bg-clip-text text-transparent;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2.5 rounded-2xl px-6 py-3.5 text-sm font-semibold text-white shadow-glass backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow active:scale-[0.98];
+    border: 1px solid rgba(201, 169, 98, 0.3);
+    background-color: rgba(201, 169, 98, 0.15);
+  }
+
+  .btn-primary:hover {
+    border-color: rgba(201, 169, 98, 0.5);
+    background-color: rgba(201, 169, 98, 0.25);
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-6 py-3.5 text-sm font-medium text-warm-100 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.1] active:scale-[0.98];
+  }
+
+  .section-label {
+    @apply mb-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-gold;
+  }
+
+  .section-title {
+    @apply font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl;
+  }
+
+  .nav-link {
+    @apply relative text-sm font-medium text-warm-300 transition-colors duration-200 hover:text-white;
+  }
+
+  .nav-link-active {
+    @apply text-white;
+  }
+
+  .skeleton {
+    @apply animate-pulse rounded-xl bg-white/[0.06];
+  }
+
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.03) 0%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0.03) 100%
+    );
+    background-size: 200% 100%;
+    @apply animate-shimmer;
+  }
+}
+
 @layer utilities {
   .scrollbar-hide {
     -ms-overflow-style: none;
@@ -10,5 +96,77 @@
 
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(201, 169, 98, 0.3) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(201, 169, 98, 0.3);
+    border-radius: 9999px;
+  }
+
+  .animate-delay-100 {
+    animation-delay: 100ms;
+  }
+
+  .animate-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animate-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  @keyframes heroKenBurns {
+    from {
+      transform: scale(1.08);
+    }
+    to {
+      transform: scale(1.18);
+    }
+  }
+
+  .hero-ken-burns {
+    animation: heroKenBurns 14s ease-out forwards;
+  }
+
+  @keyframes heroContentIn {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .hero-content-in {
+    animation: heroContentIn 0.7s ease-out forwards;
+  }
+
+  @keyframes heroProgress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .hero-progress-bar {
+    animation: heroProgress var(--hero-duration, 6500ms) linear forwards;
   }
 }

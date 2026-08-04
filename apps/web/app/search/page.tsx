@@ -1,15 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
-import Footer from '../components/footer';
-import { Navbar } from '../components/navbar';
+import { SearchSpotlight } from '../components/ui/LayoutSections';
+import { PageShell } from '../components/ui/PageShell';
+import { PageLoadingShell, PosterGridSkeleton } from '../components/ui/Skeleton';
 import type { Media } from '../lib/tmdb';
-
-const watchLink = (item: Media) => item.media_type === 'movie'
-  ? `/watch/movie/${item.id}`
-  : `/watch/tv/${item.id}/1/1`;
 
 function SearchResultsContent() {
   const searchParams = useSearchParams();
@@ -43,37 +39,67 @@ function SearchResultsContent() {
   }, [query]);
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
-      <Navbar />
-      <div className="mx-auto max-w-7xl px-4 pb-12 pt-8">
-        <h1 className="text-3xl font-bold sm:text-4xl">Search results</h1>
-        {query ? <p className="mt-2 text-zinc-400">Showing movies and series matching “{query}”.</p> : <p className="mt-2 text-zinc-400">Enter a movie or series name in the search box.</p>}
+    <PageShell>
+      <div className="grid gap-10 pt-4 lg:grid-cols-[240px_1fr] lg:gap-14">
+        <aside className="animate-fade-in lg:sticky lg:top-28 lg:self-start">
+          <p className="section-label">Search</p>
+          <h1 className="font-display text-4xl font-semibold text-white">Results</h1>
 
-        {status === 'loading' ? <p className="mt-10 text-zinc-400">Searching…</p> : null}
-        {status === 'error' ? <p className="mt-10 rounded-lg bg-red-950 p-4 text-red-200">Search is temporarily unavailable. Please try again.</p> : null}
-        {status === 'ready' && query && results.length === 0 ? <p className="mt-10 rounded-lg bg-zinc-900 p-4 text-zinc-300">“{query}” is not available.</p> : null}
+          {query ? (
+            <div className="mt-6 rounded-2xl border border-white/[0.06] bg-canvas-surface/60 p-5">
+              <p className="text-xs uppercase tracking-wider text-warm-400">Query</p>
+              <p className="mt-2 font-display text-xl text-gold-light">&ldquo;{query}&rdquo;</p>
+              {status === 'ready' ? (
+                <p className="mt-3 text-sm text-warm-400">
+                  {results.length} {results.length === 1 ? 'title' : 'titles'} found
+                </p>
+              ) : null}
+            </div>
+          ) : (
+            <p className="mt-4 text-sm text-warm-400">
+              Use the search bar above to find films and series.
+            </p>
+          )}
 
-        {status === 'ready' && results.length > 0 ? (
-          <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-            {results.map((item) => (
-              <Link key={`${item.media_type}-${item.id}`} href={watchLink(item)} className="group">
-                <article>
-                  <div className="aspect-[2/3] overflow-hidden rounded-lg bg-zinc-800 shadow">
-                    {item.poster_path ? <img src={item.poster_path} alt={item.title} className="h-full w-full object-cover transition duration-200 group-hover:scale-105" /> : <div className="flex h-full items-center justify-center p-4 text-center text-zinc-400">No poster available</div>}
-                  </div>
-                  <h2 className="mt-2 truncate font-medium">{item.title}</h2>
-                  <p className="text-sm text-zinc-400">{item.release_date.slice(0, 4) || 'Year unknown'} · {item.media_type === 'movie' ? 'Movie' : 'Series'}</p>
-                </article>
-              </Link>
-            ))}
+          <div className="mt-6 hidden space-y-2 lg:block">
+            <p className="text-xs uppercase tracking-wider text-warm-500">Tips</p>
+            <p className="text-sm text-warm-400">Try searching by title, genre, or year for best results.</p>
           </div>
-        ) : null}
+        </aside>
+
+        <div className="min-w-0">
+          {status === 'loading' ? (
+            <PosterGridSkeleton count={10} />
+          ) : null}
+
+          {status === 'error' ? (
+            <div className="rounded-2xl border border-red-500/20 bg-red-950/40 p-5 text-red-100">
+              Search is temporarily unavailable. Please try again.
+            </div>
+          ) : null}
+
+          {status === 'ready' && query && results.length === 0 ? (
+            <div className="rounded-3xl glass p-12 text-center">
+              <p className="font-display text-3xl text-warm-200">No matches</p>
+              <p className="mt-3 text-warm-400">
+                &ldquo;{query}&rdquo; isn&apos;t in our catalogue yet.
+              </p>
+            </div>
+          ) : null}
+
+          {status === 'ready' && results.length > 0 ? (
+            <SearchSpotlight query={query} results={results} />
+          ) : null}
+        </div>
       </div>
-      <Footer />
-    </main>
+    </PageShell>
   );
 }
 
 export default function SearchResultsPage() {
-  return <Suspense fallback={<main className="min-h-screen bg-zinc-950 p-10 text-center text-white">Loading search…</main>}><SearchResultsContent /></Suspense>;
+  return (
+    <Suspense fallback={<PageLoadingShell message="Loading search…" />}>
+      <SearchResultsContent />
+    </Suspense>
+  );
 }

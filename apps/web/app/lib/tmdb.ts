@@ -28,6 +28,17 @@ async function collection(path: string, type: 'movie' | 'tv') { const data = awa
 export const getTrendingMovies = () => collection('/trending/movie/week', 'movie');
 export const getPopularMovies = () => collection('/movie/popular', 'movie');
 export const getPopularTv = () => collection('/tv/popular', 'tv');
+export const getRelatedMedia = (type: 'movie' | 'tv', id: string) =>
+  collection(`/${type}/${id}/recommendations`, type);
+
+export async function isAnimeSeries(id: string) {
+  const data = await tmdbFetch<{
+    original_language?: string;
+    genres?: { id: number }[];
+  }>(`/tv/${id}`);
+
+  return data.original_language === 'ja' && data.genres?.some((genre) => genre.id === 16) === true;
+}
 export const getAnime = () => collection('/discover/tv?with_genres=16&with_original_language=ja&sort_by=popularity.desc', 'tv');
 export const getNetflixOriginals = () => collection('/discover/tv?with_networks=213', 'tv');
 export const getAmazonPrimeOriginals = () => collection('/discover/tv?with_networks=1024', 'tv');

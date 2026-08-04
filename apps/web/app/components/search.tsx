@@ -4,9 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Media } from '../lib/tmdb';
 
-const resultLink = (item: Media) => item.media_type === 'movie'
-  ? `/watch/movie/${item.id}`
-  : `/watch/tv/${item.id}/1/1`;
+const resultLink = (item: Media) =>
+  item.media_type === 'movie' ? `/watch/movie/${item.id}` : `/watch/tv/${item.id}/1/1`;
 
 export default function SearchBar() {
   const [query, setQuery] = useState('');
@@ -31,9 +30,11 @@ export default function SearchBar() {
       setIsSearching(true);
       setMessage('');
       try {
-        const response = await fetch(`/api/search?q=${encodeURIComponent(trimmedQuery)}`, { signal: controller.signal });
+        const response = await fetch(`/api/search?q=${encodeURIComponent(trimmedQuery)}`, {
+          signal: controller.signal,
+        });
         if (!response.ok) throw new Error('Search failed');
-        const data = await response.json() as { results: Media[] };
+        const data = (await response.json()) as { results: Media[] };
         setResults(data.results.slice(0, 6));
       } catch (error) {
         if ((error as Error).name !== 'AbortError') {
@@ -53,7 +54,9 @@ export default function SearchBar() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) setShowSuggestions(false);
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -77,13 +80,23 @@ export default function SearchBar() {
   const hasDropdownContent = isSearching || results.length > 0 || message;
 
   return (
-    <div className="relative z-50 mx-auto w-full max-w-md" ref={containerRef}>
-      <div className="relative w-full">
+    <div className="relative z-50 w-full max-w-[200px] sm:max-w-xs lg:max-w-sm" ref={containerRef}>
+      <div className="relative">
+        <svg
+          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-warm-400"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2}
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+        </svg>
         <input
-          className="h-7 w-full rounded-md border-2 border-gray-300 bg-transparent px-0.5 pr-10 text-sm text-white placeholder:text-gray-300 focus:outline-none sm:px-4"
+          className="h-9 w-full rounded-2xl border border-white/[0.08] bg-white/[0.05] py-2 pl-9 pr-9 text-sm text-white placeholder:text-warm-400 backdrop-blur-md transition-all duration-300 focus:border-gold/30 focus:bg-white/[0.08] focus:outline-none focus:ring-1 focus:ring-gold/20 sm:h-10 sm:pl-10 sm:pr-10"
           type="search"
           name="search"
-          placeholder="Search movies and series"
+          placeholder="Search…"
           value={query}
           onChange={(event) => {
             setQuery(event.target.value);
@@ -97,29 +110,60 @@ export default function SearchBar() {
           }}
           onFocus={() => query.trim() && setShowSuggestions(true)}
         />
-        <button type="button" aria-label="Search" onClick={handleSearch} className="absolute right-2 top-1/2 -translate-y-1/2">
-          <svg className="h-4 w-4 fill-current text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56.966 56.966" width="16" height="16">
-            <path d="M55.146,51.887L41.588,37.786c3.486-4.144,5.396-9.358,5.396-14.786c0-12.682-10.318-23-23-23s-23,10.318-23,23s10.318,23,23,23c4.761,0,9.298-1.436,13.177-4.162l13.661,14.208c.571.593,1.339.92,2.162.92.779,0,1.518-.297,2.079-.837C56.255,54.982,56.293,53.08,55.146,51.887zM23.984,6c9.374,0,17,7.626,17,17s-7.626,17-17,17s-17-7.626-17-17S14.61,6,23.984,6z" />
+        <button
+          type="button"
+          aria-label="Search"
+          onClick={handleSearch}
+          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-1 text-warm-400 transition hover:bg-white/[0.08] hover:text-gold-light"
+        >
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
           </svg>
         </button>
       </div>
 
       {showSuggestions && hasDropdownContent ? (
-        <div className="absolute mt-2 w-full overflow-hidden rounded-md bg-white text-sm text-black shadow-lg">
-          {isSearching ? <p className="px-4 py-3 text-gray-600">Searching…</p> : null}
-          {!isSearching && results.map((item) => (
-            <button key={`${item.media_type}-${item.id}`} type="button" className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-gray-200" onClick={() => handleSelect(item)}>
-              <div className="h-12 w-8 shrink-0 overflow-hidden rounded bg-gray-200">
-                {item.poster_path ? <img src={item.poster_path} alt="" className="h-full w-full object-cover" /> : null}
-              </div>
-              <span className="min-w-0">
-                <span className="block truncate font-medium">{item.title}</span>
-                <span className="block text-xs text-gray-500">{item.release_date.slice(0, 4) || 'Year unknown'} · {item.media_type === 'movie' ? 'Movie' : 'Series'}</span>
-              </span>
+        <div className="absolute mt-2 w-[280px] overflow-hidden rounded-2xl border border-white/[0.08] bg-canvas-elevated/95 text-sm shadow-card backdrop-blur-2xl sm:w-full">
+          {isSearching ? (
+            <div className="flex items-center gap-3 px-4 py-4">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gold/20 border-t-gold" />
+              <span className="text-warm-300">Searching…</span>
+            </div>
+          ) : null}
+          {!isSearching &&
+            results.map((item) => (
+              <button
+                key={`${item.media_type}-${item.id}`}
+                type="button"
+                className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition hover:bg-white/[0.06]"
+                onClick={() => handleSelect(item)}
+              >
+                <div className="h-14 w-10 shrink-0 overflow-hidden rounded-lg border border-white/[0.06] bg-canvas-surface">
+                  {item.poster_path ? (
+                    <img src={item.poster_path} alt="" className="h-full w-full object-cover" />
+                  ) : null}
+                </div>
+                <span className="min-w-0">
+                  <span className="block truncate font-medium text-white">{item.title}</span>
+                  <span className="block text-xs text-warm-400">
+                    {item.release_date.slice(0, 4) || 'Year unknown'} ·{' '}
+                    {item.media_type === 'movie' ? 'Film' : 'Series'}
+                  </span>
+                </span>
+              </button>
+            ))}
+          {!isSearching && results.length > 0 ? (
+            <button
+              type="button"
+              className="w-full border-t border-white/[0.06] px-4 py-3 text-left text-sm font-medium text-gold transition hover:bg-gold/10"
+              onClick={handleSearch}
+            >
+              View all results for &ldquo;{query.trim()}&rdquo;
             </button>
-          ))}
-          {!isSearching && results.length > 0 ? <button type="button" className="w-full border-t border-gray-200 px-4 py-3 text-left font-medium text-red-700 hover:bg-gray-100" onClick={handleSearch}>Show all results for “{query.trim()}”</button> : null}
-          {!isSearching && message ? <p className="px-4 py-3 text-gray-700">{message}</p> : null}
+          ) : null}
+          {!isSearching && message ? (
+            <p className="px-4 py-3 text-warm-300">{message}</p>
+          ) : null}
         </div>
       ) : null}
     </div>

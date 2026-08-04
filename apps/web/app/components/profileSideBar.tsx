@@ -3,10 +3,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
-import { useUser } from '../context/UserContext'; // adjust path if needed
+import { useUser } from '../context/UserContext';
 
 export default function ProfileSidebar() {
-  const { name, setName } = useUser(); // use context instead of local session
+  const { name, setName } = useUser();
   const { update: updateSession } = useSession();
   const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -19,10 +19,9 @@ export default function ProfileSidebar() {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setInputValue(name); // sync input with current name
+    setInputValue(name);
   }, [name]);
 
-  // Close dropdown if clicking outside
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -94,25 +93,29 @@ export default function ProfileSidebar() {
 
   return (
     <div className="relative z-50" ref={menuRef}>
-      <div className="ml-2 cursor-pointer" onClick={() => setOpen(!open)}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        aria-label="Open profile menu"
+        className="ml-1 h-10 w-10 shrink-0 overflow-hidden rounded-lg border-2 border-white/[0.08] transition-all duration-300 hover:border-gold/30 hover:shadow-glow"
+      >
         <img
-          className="rounded-lg"
+          className="block h-full w-full object-cover"
           src="/profile/profilePic.jpg"
-          width={50}
-          height={50}
-          alt="profile"
+          width={40}
+          height={40}
+          alt="Profile"
         />
-      </div>
+      </button>
 
       <div
         className={`
-          absolute right-0 mt-2 w-60 bg-black text-white rounded-lg shadow-lg transition-all duration-300 ease-out
-          transform origin-top-right
-          ${open ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}
+          absolute right-0 mt-3 w-64 origin-top-right overflow-hidden rounded-2xl glass-strong shadow-card transition-all duration-300 ease-out
+          ${open ? 'scale-100 opacity-100' : 'pointer-events-none scale-95 opacity-0'}
         `}
       >
-        <div className="p-4 border-b border-gray-700">
-          <div className="font-semibold text-lg">
+        <div className="border-b border-white/[0.06] p-4">
+          <div className="font-semibold text-lg text-white">
             {isEditing ? (
               <input
                 type="text"
@@ -120,51 +123,50 @@ export default function ProfileSidebar() {
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 autoFocus
-                className="bg-gray-800 px-2 py-1 rounded text-white w-full"
+                className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-3 py-2 text-white focus:border-gold/30 focus:outline-none focus:ring-1 focus:ring-gold/20"
               />
             ) : (
               name
             )}
           </div>
 
-          <div className="mt-1">
+          <div className="mt-2">
             {isEditing ? (
               <button
                 type="button"
-                className="text-sm text-green-400 mt-1"
+                className="text-sm font-medium text-gold transition hover:text-gold-light"
                 onClick={handleSaveClick}
                 disabled={isSaving}
               >
-                {isSaving ? 'Saving...' : 'Save'}
+                {isSaving ? 'Saving…' : 'Save changes'}
               </button>
             ) : (
               <button
                 type="button"
-                className="text-sm text-gray-400"
+                className="text-sm text-warm-400 transition hover:text-warm-200"
                 onClick={handleEditClick}
               >
-                Edit Name
+                Edit name
               </button>
             )}
           </div>
 
-          {showSavedMsg && (
-            <div className="text-xs text-yellow-400 mt-1">
-              Name updated!
-            </div>
-          )}
-          {error && <div className="text-xs text-red-400 mt-1">{error}</div>}
+          {showSavedMsg && <div className="mt-2 text-xs text-gold-light">Name updated</div>}
+          {error && <div className="mt-2 text-xs text-red-400">{error}</div>}
 
-          <div className="text-m text-gray-400 mt-2">Netflix+ Member</div>
+          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-gold/20 bg-gold/10 px-3 py-1 text-xs font-medium text-gold-light">
+            <span className="h-1.5 w-1.5 rounded-full bg-gold animate-pulse-soft" />
+            Premium Member
+          </div>
         </div>
 
-        <div className="p-2 space-y-2">
+        <div className="p-2">
           <button
             type="button"
-            className="w-full text-left px-4 py-2 hover:bg-gray-800 rounded-md text-red-400"
+            className="w-full rounded-xl px-4 py-2.5 text-left text-sm text-red-400 transition hover:bg-red-500/10"
             onClick={handleLogout}
           >
-            Logout
+            Sign out
           </button>
         </div>
       </div>
