@@ -80,7 +80,7 @@ export const Navbar = () => {
       <div className="mx-auto flex max-w-[1500px] items-center justify-between px-4 py-4 sm:px-8 lg:px-12">
         {/* Mobile and tablet */}
         <div className="w-full space-y-3 xl:hidden">
-          <div className="flex items-center justify-between gap-3">
+          <div className="relative z-[60] flex items-center justify-between gap-3">
             <Link href="/" className="shrink-0 transition-opacity hover:opacity-80">
               <img src="/png/series/netflix.png" alt="Netflix" className="h-7 w-auto" />
             </Link>

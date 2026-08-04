@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./Providers";
+import { WatchNavigationLoader } from "./components/WatchNavigationLoader";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,7 +30,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${cormorant.variable} font-sans`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <WatchNavigationLoader />
+          {children}
+        </Providers>
       </body>
     </html>
   );
