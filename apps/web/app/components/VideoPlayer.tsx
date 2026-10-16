@@ -23,10 +23,10 @@ type Props = {
 
 // 👇 Updated servers: VidLink at the top, Embed.su removed, and clean low-ad servers added.
 const SERVERS = [
-  {
-    name: 'Server 1 (VidLink - Fast)',
+  {name: 'Server 1 (VidFast - Clean)',
     getUrl: (type: string, id: string, s: number, e: number) =>
-      type === 'tv' ? `https://vidlink.pro/tv/${id}/${s}/${e}` : `https://vidlink.pro/movie/${id}`,
+      type === 'tv' ? `https://vidfast.pro/tv/${id}/${s}/${e}` : `https://vidfast.pro/movie/${id}`,
+    
   },
   {
     name: 'Server 2 (VidEasy - Low Ads)',
@@ -39,9 +39,9 @@ const SERVERS = [
       type === 'tv' ? `https://player.autoembed.cc/embed/tv/${id}/${s}/${e}` : `https://player.autoembed.cc/embed/movie/${id}`,
   },
   {
-    name: 'Server 4 (VidFast - Clean)',
+    name: 'Server 4 (VidLink - Fast)',
     getUrl: (type: string, id: string, s: number, e: number) =>
-      type === 'tv' ? `https://vidfast.pro/tv/${id}/${s}/${e}` : `https://vidfast.pro/movie/${id}`,
+      type === 'tv' ? `https://vidlink.pro/tv/${id}/${s}/${e}` : `https://vidlink.pro/movie/${id}`,
   },
   {
     name: 'Server 5 (SmashyVid - Backup)',

@@ -190,6 +190,8 @@ export function CinematicHero({
   const [isPaused, setIsPaused] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const didSwipeRef = useRef(false);
 
   const goTo = useCallback(
     (index: number) => {
@@ -236,9 +238,43 @@ export function CinematicHero({
       onBlur={() => setIsPaused(false)}
     >
       <section
-        className={sectionClass}
+        className={`${sectionClass} touch-pan-y`}
         aria-roledescription="carousel"
         aria-label="Featured titles"
+        onTouchStart={(event) => {
+          didSwipeRef.current = false;
+          if (event.touches.length !== 1) {
+            touchStartRef.current = null;
+            return;
+          }
+          const touch = event.touches.item(0);
+          if (!touch) return;
+          touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+        }}
+        onTouchEnd={(event) => {
+          const start = touchStartRef.current;
+          touchStartRef.current = null;
+          if (!start || event.changedTouches.length !== 1) return;
+
+          const touch = event.changedTouches.item(0);
+          if (!touch) return;
+          const deltaX = touch.clientX - start.x;
+          const deltaY = touch.clientY - start.y;
+          if (Math.abs(deltaX) < 48 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) return;
+
+          didSwipeRef.current = true;
+          if (deltaX < 0) next();
+          else prev();
+        }}
+        onTouchCancel={() => {
+          touchStartRef.current = null;
+        }}
+        onClickCapture={(event) => {
+          if (!didSwipeRef.current) return;
+          didSwipeRef.current = false;
+          event.preventDefault();
+          event.stopPropagation();
+        }}
       >
       {slides.map((item, index) => (
         <HeroBackground key={`${item.media_type}-${item.id}`} item={item} isActive={index === activeIndex} />
